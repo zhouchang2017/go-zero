@@ -81,7 +81,7 @@ func startAgent(c Config) error {
 	if len(c.Endpoint) > 0 {
 		exp, err := createExporter(c)
 		if err != nil {
-			logx.Error(err)
+			logx.GlobalLogger().Error(err)
 			return err
 		}
 
@@ -92,7 +92,7 @@ func startAgent(c Config) error {
 	tp = sdktrace.NewTracerProvider(opts...)
 	otel.SetTracerProvider(tp)
 	otel.SetErrorHandler(otel.ErrorHandlerFunc(func(err error) {
-		logx.Errorf("[otel] error: %v", err)
+		logx.GlobalLogger().Errorf("[otel] error: %v", err)
 	}))
 
 	return nil

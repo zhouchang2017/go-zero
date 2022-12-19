@@ -99,7 +99,7 @@ func (s *Server) Start() {
 
 // Stop stops the Server.
 func (s *Server) Stop() {
-	logx.Close()
+	//logx.Close()
 }
 
 // Use adds the given middleware in the Server.
@@ -282,7 +282,7 @@ func handleError(err error) {
 		return
 	}
 
-	logx.Error(err)
+	logx.GlobalLogger().Error(err)
 	panic(err)
 }
 

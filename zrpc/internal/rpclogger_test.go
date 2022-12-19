@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"strings"
 	"testing"
 
@@ -11,129 +12,116 @@ import (
 const content = "foo"
 
 func TestLoggerError(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Error(content)
+	logx.FromCtx(ctx).Error(content)
 	assert.Contains(t, w.String(), content)
 }
 
 func TestLoggerErrorf(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Errorf(content)
+	logx.FromCtx(ctx).Error(content)
 	assert.Contains(t, w.String(), content)
 }
 
 func TestLoggerErrorln(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Errorln(content)
+	logx.FromCtx(ctx).Errorln(content)
 	assert.Contains(t, w.String(), content)
 }
 
 func TestLoggerFatal(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Fatal(content)
+	logx.FromCtx(ctx).Warnf(content)
 	assert.Contains(t, w.String(), content)
 }
 
 func TestLoggerFatalf(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Fatalf(content)
+	logx.FromCtx(ctx).Fatalf(content)
 	assert.Contains(t, w.String(), content)
 }
 
 func TestLoggerFatalln(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Fatalln(content)
+	logx.FromCtx(ctx).Fatalln(content)
 	assert.Contains(t, w.String(), content)
 }
 
 func TestLoggerInfo(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Info(content)
+	logx.FromCtx(ctx).Info(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerInfof(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Infof(content)
+	logx.FromCtx(ctx).Infof(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerWarning(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Warning(content)
+	logx.FromCtx(ctx).Warning(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerInfoln(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Infoln(content)
+	logx.FromCtx(ctx).Infoln(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerWarningf(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Warningf(content)
+	logx.FromCtx(ctx).Warningf(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerWarningln(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logger := new(Logger)
-	logger.Warningln(content)
+	logx.FromCtx(ctx).Warningln(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLogger_V(t *testing.T) {
-	logger := new(Logger)
+	ctx, _, restore := injectLog()
+	defer restore()
 	// grpclog.fatalLog
-	assert.True(t, logger.V(3))
+	assert.True(t, logx.FromCtx(ctx).V(3))
 	// grpclog.infoLog
-	assert.False(t, logger.V(0))
+	assert.False(t, logx.FromCtx(ctx).V(0))
 }
 
-func injectLog() (r *strings.Builder, restore func()) {
+func injectLog() (ctx context.Context, r *strings.Builder, restore func()) {
 	var buf strings.Builder
-	w := logx.NewWriter(&buf)
-	o := logx.Reset()
-	logx.SetWriter(w)
+	w := logx.NewTestLogger(&buf)
+	ctx = logx.WithCtx(context.Background(), w)
 
-	return &buf, func() {
-		logx.Reset()
-		logx.SetWriter(o)
+	return ctx, &buf, func() {
+		buf.Reset()
 	}
 }

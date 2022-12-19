@@ -3,14 +3,14 @@ package mon
 import (
 	"context"
 	"errors"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/timex"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/breaker"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stringx"
-	"github.com/zeromicro/go-zero/core/timex"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -574,50 +574,46 @@ func TestDecoratedCollection_LogDuration(t *testing.T) {
 	}
 
 	var buf strings.Builder
-	w := logx.NewWriter(&buf)
-	o := logx.Reset()
-	logx.SetWriter(w)
 
-	defer func() {
-		logx.Reset()
-		logx.SetWriter(o)
-	}()
+	testLogger := logx.NewTestLogger(&buf)
+
+	ctx := logx.WithCtx(context.Background(), testLogger)
 
 	buf.Reset()
-	c.logDuration(context.Background(), "foo", timex.Now(), nil, "bar")
+	c.logDuration(ctx, "foo", timex.Now(), nil, "bar")
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "bar")
 
 	buf.Reset()
-	c.logDuration(context.Background(), "foo", timex.Now(), errors.New("bar"), make(chan int))
+	c.logDuration(ctx, "foo", timex.Now(), errors.New("bar"), make(chan int))
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "bar")
 
 	buf.Reset()
-	c.logDuration(context.Background(), "foo", timex.Now(), nil, make(chan int))
+	c.logDuration(ctx, "foo", timex.Now(), nil, make(chan int))
 	assert.Contains(t, buf.String(), "foo")
 
 	buf.Reset()
-	c.logDuration(context.Background(), "foo", timex.Now()-slowThreshold.Load()*2,
+	c.logDuration(ctx, "foo", timex.Now()-slowThreshold.Load()*2,
 		nil, make(chan int))
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "slowcall")
 
 	buf.Reset()
-	c.logDuration(context.Background(), "foo", timex.Now()-slowThreshold.Load()*2,
+	c.logDuration(ctx, "foo", timex.Now()-slowThreshold.Load()*2,
 		errors.New("bar"), make(chan int))
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "bar")
 	assert.Contains(t, buf.String(), "slowcall")
 
 	buf.Reset()
-	c.logDuration(context.Background(), "foo", timex.Now()-slowThreshold.Load()*2,
+	c.logDuration(ctx, "foo", timex.Now()-slowThreshold.Load()*2,
 		errors.New("bar"))
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "slowcall")
 
 	buf.Reset()
-	c.logDuration(context.Background(), "foo", timex.Now()-slowThreshold.Load()*2, nil)
+	c.logDuration(ctx, "foo", timex.Now()-slowThreshold.Load()*2, nil)
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "slowcall")
 }

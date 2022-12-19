@@ -19,7 +19,7 @@ func TestRpcGenerate(t *testing.T) {
 	g := NewGenerator("gozero", true)
 	err := g.Prepare()
 	if err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 		return
 	}
 	projectName := stringx.Rand()
@@ -65,7 +65,7 @@ func TestRpcGenerate(t *testing.T) {
 		name := filepath.Base(projectDir)
 		_, err = execx.Run("go mod init "+name, workDir)
 		if err != nil {
-			logx.Error(err)
+			logx.GlobalLogger().Error(err)
 			return
 		}
 

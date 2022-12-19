@@ -35,7 +35,7 @@ func SheddingHandler(shedder load.Shedder, metrics *stat.Metrics) func(http.Hand
 			if err != nil {
 				metrics.AddDrop()
 				sheddingStat.IncrementDrop()
-				logx.Errorf("[http] dropped, %s - %s - %s",
+				logx.GlobalLogger().Errorf("[http] dropped, %s - %s - %s",
 					r.RequestURI, httpx.GetRemoteAddr(r), r.UserAgent())
 				w.WriteHeader(http.StatusServiceUnavailable)
 				return

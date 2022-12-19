@@ -100,7 +100,7 @@ func WithUnauthorizedCallback(callback UnauthorizedCallback) AuthorizeOption {
 func detailAuthLog(r *http.Request, reason string) {
 	// discard dump error, only for debug purpose
 	details, _ := httputil.DumpRequest(r, true)
-	logx.Errorf("authorize failed: %s\n=> %+v", reason, string(details))
+	logx.GlobalLogger().Errorf("authorize failed: %s\n=> %+v", reason, string(details))
 }
 
 func unauthorized(w http.ResponseWriter, r *http.Request, err error, callback UnauthorizedCallback) {

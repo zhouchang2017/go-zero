@@ -19,7 +19,7 @@ func NewSayHiLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SayHiLogic 
 	return &SayHiLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
-		Logger: logx.WithContext(ctx),
+		Logger: logx.FromCtx(ctx),
 	}
 }
 

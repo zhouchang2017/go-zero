@@ -22,14 +22,12 @@ func Parse(filename string) (*spec.ApiSpec, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	apiSpec := new(spec.ApiSpec)
 	p := parser{ast: parsedApi, spec: apiSpec}
 	err = p.convert2Spec()
 	if err != nil {
 		return nil, err
 	}
-
 	return apiSpec, nil
 }
 
@@ -134,6 +132,11 @@ func (p parser) fillTypes() error {
 			var members []spec.Member
 			for _, member := range v.Members {
 				switch v := member.Type.(type) {
+				case spec.PrimitiveType:
+					primitiveType := member.Type.(spec.PrimitiveType)
+					if primitiveType.IsTime {
+						p.spec.ContainsTime = true
+					}
 				case spec.DefineStruct:
 					tp, err := p.findDefinedType(v.RawName)
 					if err != nil {
@@ -151,7 +154,6 @@ func (p parser) fillTypes() error {
 		}
 	}
 	p.spec.Types = types
-
 	return nil
 }
 
@@ -172,12 +174,14 @@ func (p parser) fieldToMember(field *ast.TypeField) spec.Member {
 	tag := ""
 	if !field.IsAnonymous {
 		name = field.Name.Text()
-		if field.Tag == nil {
-			panic(fmt.Sprintf("error: line %d:%d field %s has no tag", field.Name.Line(), field.Name.Column(),
-				field.Name.Text()))
-		}
 
-		tag = field.Tag.Text()
+		if field.Tag == nil {
+			//panic(fmt.Sprintf("error: line %d:%d field %s has no tag", field.Name.Line(), field.Name.Column(),
+			//	field.Name.Text()))
+			//tag = name
+		} else {
+			tag = field.Tag.Text()
+		}
 	}
 	return spec.Member{
 		Name:     name,
@@ -215,8 +219,12 @@ func (p parser) astTypeToSpec(in ast.DataType) spec.Type {
 		}
 
 		return spec.PointerType{RawName: v.PointerExpr.Text(), Type: spec.DefineStruct{RawName: raw}}
+	case *ast.Time:
+		return spec.PrimitiveType{
+			RawName: v.Literal.Text(),
+			IsTime:  true,
+		}
 	}
-
 	panic(fmt.Sprintf("unspported type %+v", in))
 }
 

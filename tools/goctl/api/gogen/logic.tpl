@@ -12,12 +12,14 @@ type {{.logic}} struct {
 
 func New{{.logic}}(ctx context.Context, svcCtx *svc.ServiceContext) *{{.logic}} {
 	return &{{.logic}}{
-		Logger: logx.WithContext(ctx),
+		Logger: logx.FromCtx(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
+// {{.HandlerName}}
+{{.HandlerDoc }}
 func (l *{{.logic}}) {{.function}}({{.request}}) {{.responseType}} {
 	// todo: add your logic here and delete this line
 

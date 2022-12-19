@@ -3,7 +3,9 @@ package gogen
 import (
 	_ "embed"
 	"fmt"
+	"github.com/zeromicro/go-zero/tools/goctl/vars"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
@@ -21,6 +23,7 @@ var handlerTemplate string
 
 type handlerInfo struct {
 	PkgName            string
+	ModuleUrl          string
 	ImportPackages     string
 	ImportHttpxPackage string
 	HandlerName        string
@@ -30,6 +33,9 @@ type handlerInfo struct {
 	Call               string
 	HasResp            bool
 	HasRequest         bool
+	HandlerDoc         []string
+
+	IsActionHandler bool
 }
 
 func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route spec.Route) error {
@@ -45,17 +51,19 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 	if err != nil {
 		return err
 	}
-
 	return doGenToFile(dir, handler, cfg, group, route, handlerInfo{
-		PkgName:        pkgName,
-		ImportPackages: genHandlerImports(group, route, parentPkg),
-		HandlerName:    handler,
-		RequestType:    util.Title(route.RequestTypeName()),
-		LogicName:      logicName,
-		LogicType:      strings.Title(getLogicName(route)),
-		Call:           strings.Title(strings.TrimSuffix(handler, "Handler")),
-		HasResp:        len(route.ResponseTypeName()) > 0,
-		HasRequest:     len(route.RequestTypeName()) > 0,
+		PkgName:         pkgName,
+		ModuleUrl:       vars.ProjectOpenSourceURL,
+		ImportPackages:  genHandlerImports(group, route, parentPkg),
+		HandlerName:     handler,
+		RequestType:     util.Title(route.RequestTypeName()),
+		LogicName:       logicName,
+		LogicType:       strings.Title(getLogicName(route)),
+		Call:            strings.Title(strings.TrimSuffix(handler, "Handler")),
+		HasResp:         len(route.ResponseTypeName()) > 0,
+		HasRequest:      len(route.RequestTypeName()) > 0,
+		HandlerDoc:      route.HandlerDoc,
+		IsActionHandler: len(group.GetAnnotation("action")) > 0,
 	})
 }
 
@@ -95,6 +103,9 @@ func genHandlerImports(group spec.Group, route spec.Route, parentPkg string) str
 	imports := []string{
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, getLogicFolderPath(group, route))),
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)),
+	}
+	if len(group.GetAnnotation("action")) > 0 {
+		imports = append(imports, strconv.Quote("context"))
 	}
 	if len(route.RequestTypeName()) > 0 {
 		imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir)))

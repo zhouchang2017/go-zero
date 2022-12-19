@@ -267,22 +267,14 @@ func TestCollectionUpsert(t *testing.T) {
 func Test_logDuration(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
+	var buf strings.Builder
+	logger := logx.NewTestLogger(&buf)
 	col := internal.NewMockMgoCollection(ctrl)
 	c := decoratedCollection{
 		collection: col,
 		brk:        breaker.NewBreaker(),
+		logger:     logger,
 	}
-
-	var buf strings.Builder
-	w := logx.NewWriter(&buf)
-	o := logx.Reset()
-	logx.SetWriter(w)
-
-	defer func() {
-		logx.Reset()
-		logx.SetWriter(o)
-	}()
 
 	buf.Reset()
 	c.logDuration("foo", time.Millisecond, nil, "bar")

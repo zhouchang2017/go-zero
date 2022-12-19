@@ -39,7 +39,7 @@ func (pusher *BalancedPusher) Push(message string) error {
 		target := pusher.pushers[index]
 
 		if err := target.Push(message); err != nil {
-			logx.Error(err)
+			logx.GlobalLogger().Error(err)
 		} else {
 			return nil
 		}

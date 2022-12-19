@@ -11,6 +11,7 @@ import (
 const (
 	prefixKey = "prefix"
 	groupKey  = "group"
+	actionKey = "action"
 )
 
 // Api describes syntax for api

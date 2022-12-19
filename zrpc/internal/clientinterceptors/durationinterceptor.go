@@ -27,7 +27,7 @@ func DurationInterceptor(ctx context.Context, method string, req, reply interfac
 	start := timex.Now()
 	err := invoker(ctx, method, req, reply, cc, opts...)
 	if err != nil {
-		logger := logx.WithContext(ctx).WithDuration(timex.Since(start))
+		logger := logx.FromCtx(ctx).WithDuration(timex.Since(start))
 		_, ok := notLoggingContentMethods.Load(method)
 		if ok {
 			logger.Errorf("fail - %s - %s", serverName, err.Error())
@@ -37,7 +37,7 @@ func DurationInterceptor(ctx context.Context, method string, req, reply interfac
 	} else {
 		elapsed := timex.Since(start)
 		if elapsed > slowThreshold.Load() {
-			logger := logx.WithContext(ctx).WithDuration(elapsed)
+			logger := logx.FromCtx(ctx).WithDuration(elapsed)
 			_, ok := notLoggingContentMethods.Load(method)
 			if ok {
 				logger.Slowf("[RPC] ok - slowcall - %s", serverName)

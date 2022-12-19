@@ -80,7 +80,7 @@ func (in *dbInserter) Execute(objs interface{}) {
 	if in.resultHandler != nil {
 		in.resultHandler(result, err)
 	} else if err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 	}
 }
 

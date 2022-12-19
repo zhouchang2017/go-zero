@@ -78,14 +78,14 @@ func SetErrorHandlerCtx(handlerCtx func(context.Context, error) (int, interface{
 // WriteJson writes v as json string into w with code.
 func WriteJson(w http.ResponseWriter, code int, v interface{}) {
 	if err := doWriteJson(w, code, v); err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 	}
 }
 
 // WriteJsonCtx writes v as json string into w with code.
 func WriteJsonCtx(ctx context.Context, w http.ResponseWriter, code int, v interface{}) {
 	if err := doWriteJson(w, code, v); err != nil {
-		logx.WithContext(ctx).Error(err)
+		logx.FromCtx(ctx).Error(err)
 	}
 }
 

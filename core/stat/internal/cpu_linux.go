@@ -28,7 +28,7 @@ var (
 func initialize() {
 	cpus, err := cpuSets()
 	if err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 		return
 	}
 
@@ -39,7 +39,7 @@ func initialize() {
 		if cq != -1 {
 			period, err := cpuPeriod()
 			if err != nil {
-				logx.Error(err)
+				logx.GlobalLogger().Error(err)
 				return
 			}
 
@@ -52,13 +52,13 @@ func initialize() {
 
 	preSystem, err = systemCpuUsage()
 	if err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 		return
 	}
 
 	preTotal, err = totalCpuUsage()
 	if err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 		return
 	}
 }

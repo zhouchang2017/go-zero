@@ -37,9 +37,9 @@ func exec(db *sql.DB, q string, args ...interface{}) (sql.Result, error) {
 	result, err := tx.Exec(q, args...)
 	duration := timex.Since(startTime)
 	if duration > slowThreshold {
-		logx.WithDuration(duration).Slowf("[SQL] exec: slowcall - %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Slowf("[SQL] exec: slowcall - %s", stmt)
 	} else {
-		logx.WithDuration(duration).Infof("sql exec: %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Infof("sql exec: %s", stmt)
 	}
 	if err != nil {
 		logSqlError(stmt, err)
@@ -54,9 +54,9 @@ func execStmt(conn *sql.Stmt, args ...interface{}) (sql.Result, error) {
 	result, err := conn.Exec(args...)
 	duration := timex.Since(startTime)
 	if duration > slowThreshold {
-		logx.WithDuration(duration).Slowf("[SQL] execStmt: slowcall - %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Slowf("[SQL] execStmt: slowcall - %s", stmt)
 	} else {
-		logx.WithDuration(duration).Infof("sql execStmt: %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Infof("sql execStmt: %s", stmt)
 	}
 	if err != nil {
 		logSqlError(stmt, err)
@@ -89,9 +89,9 @@ func query(db *sql.DB, scanner func(*sql.Rows) error, q string, args ...interfac
 	rows, err := tx.Query(q, args...)
 	duration := timex.Since(startTime)
 	if duration > slowThreshold {
-		logx.WithDuration(duration).Slowf("[SQL] query: slowcall - %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Slowf("[SQL] query: slowcall - %s", stmt)
 	} else {
-		logx.WithDuration(duration).Infof("sql query: %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Infof("sql query: %s", stmt)
 	}
 	if err != nil {
 		logSqlError(stmt, err)
@@ -108,9 +108,9 @@ func queryStmt(conn *sql.Stmt, scanner func(*sql.Rows) error, args ...interface{
 	rows, err := conn.Query(args...)
 	duration := timex.Since(startTime)
 	if duration > slowThreshold {
-		logx.WithDuration(duration).Slowf("[SQL] queryStmt: slowcall - %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Slowf("[SQL] queryStmt: slowcall - %s", stmt)
 	} else {
-		logx.WithDuration(duration).Infof("sql queryStmt: %s", stmt)
+		logx.GlobalLogger().WithDuration(duration).Infof("sql queryStmt: %s", stmt)
 	}
 	if err != nil {
 		logSqlError(stmt, err)

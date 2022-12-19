@@ -56,7 +56,7 @@ func logDuration(ctx context.Context, method string, req interface{}, duration t
 		addr = client.Addr.String()
 	}
 
-	logger := logx.WithContext(ctx).WithDuration(duration)
+	logger := logx.FromCtx(ctx).WithDuration(duration)
 	_, ok = notLoggingContentMethods.Load(method)
 	if ok {
 		if duration > slowThreshold.Load() {
@@ -65,7 +65,7 @@ func logDuration(ctx context.Context, method string, req interface{}, duration t
 	} else {
 		content, err := json.Marshal(req)
 		if err != nil {
-			logx.WithContext(ctx).Errorf("%s - %s", addr, err.Error())
+			logx.FromCtx(ctx).Errorf("%s - %s", addr, err.Error())
 		} else if duration > slowThreshold.Load() {
 			logger.Slowf("[RPC] slowcall - %s - %s - %s", addr, method, string(content))
 		} else {

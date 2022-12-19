@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
@@ -20,8 +21,25 @@ const typesFile = "types"
 //go:embed types.tpl
 var typesTemplate string
 
+var actionHandler = `type (
+	ActionHandler func(ctx context.Context, r *http.Request) (resp interface{}, err error)
+)`
+
+var actionErrors = `var (
+	// ErrActionParamsIsNil Action参数不存在
+	ErrActionParamsIsNil = errors.New("Action params is nil")
+	// ErrActionNotFound Action尚未注册
+	ErrActionNotFound = errors.New("Action not found")
+)`
+
 // BuildTypes gen types to string
-func BuildTypes(types []spec.Type) (string, error) {
+func BuildTypes(types []spec.Type, hasActions bool) (string, error) {
+	var buf strings.Builder
+	if hasActions {
+		buf.WriteString(actionHandler)
+		buf.WriteByte('\n')
+		buf.WriteByte('\n')
+	}
 	var builder strings.Builder
 	first := true
 	for _, tp := range types {
@@ -34,14 +52,39 @@ func BuildTypes(types []spec.Type) (string, error) {
 			return "", apiutil.WrapErr(err, "Type "+tp.Name()+" generate error")
 		}
 	}
-
-	return builder.String(), nil
+	buf.WriteString(builder.String())
+	return buf.String(), nil
 }
 
 func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
-	val, err := BuildTypes(api.Types)
+	containsTime := api.ContainsTime
+
+	_, actions, _ := getRoutes(api)
+	val, err := BuildTypes(api.Types, len(actions) > 0)
 	if err != nil {
 		return err
+	}
+
+	var builder strings.Builder
+	var vars strings.Builder
+	if len(actions) > 0 || containsTime {
+		builder.WriteByte('\n')
+		builder.WriteString("import (\n")
+		if len(actions) > 0 {
+			vars.WriteString(actionErrors)
+			vars.WriteByte('\n')
+			builder.WriteString(strconv.Quote("errors"))
+			builder.WriteByte('\n')
+			builder.WriteString(strconv.Quote("context"))
+			builder.WriteByte('\n')
+			builder.WriteString(strconv.Quote("net/http"))
+			builder.WriteByte('\n')
+		}
+		if containsTime {
+			builder.WriteString(strconv.Quote("time"))
+			builder.WriteByte('\n')
+		}
+		builder.WriteString(")\n")
 	}
 
 	typeFilename, err := format.FileNamingFormat(cfg.NamingFormat, typesFile)
@@ -62,8 +105,9 @@ func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 		templateFile:    typesTemplateFile,
 		builtinTemplate: typesTemplate,
 		data: map[string]interface{}{
-			"types":        val,
-			"containsTime": false,
+			"importPackages": builder.String(),
+			"vars":           vars.String(),
+			"types":          val,
 		},
 	})
 }

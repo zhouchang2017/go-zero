@@ -127,9 +127,9 @@ func (n nilGuard) finish(_ context.Context, _ error) {
 func (e *realSqlGuard) finish(ctx context.Context, err error) {
 	duration := timex.Since(e.startTime)
 	if duration > slowThreshold.Load() {
-		logx.WithContext(ctx).WithDuration(duration).Slowf("[SQL] %s: slowcall - %s", e.command, e.stmt)
+		logx.FromCtx(ctx).WithDuration(duration).Slowf("[SQL] %s: slowcall - %s", e.command, e.stmt)
 	} else if logSql.True() {
-		logx.WithContext(ctx).WithDuration(duration).Infof("sql %s: %s", e.command, e.stmt)
+		logx.FromCtx(ctx).WithDuration(duration).Infof("sql %s: %s", e.command, e.stmt)
 	}
 
 	if err != nil {

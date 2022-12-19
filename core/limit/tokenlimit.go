@@ -128,18 +128,18 @@ func (lim *TokenLimiter) reserveN(ctx context.Context, now time.Time, n int) boo
 		return false
 	}
 	if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-		logx.Errorf("fail to use rate limiter: %s", err)
+		logx.GlobalLogger().Errorf("fail to use rate limiter: %s", err)
 		return false
 	}
 	if err != nil {
-		logx.Errorf("fail to use rate limiter: %s, use in-process limiter for rescue", err)
+		logx.GlobalLogger().Errorf("fail to use rate limiter: %s, use in-process limiter for rescue", err)
 		lim.startMonitor()
 		return lim.rescueLimiter.AllowN(now, n)
 	}
 
 	code, ok := resp.(int64)
 	if !ok {
-		logx.Errorf("fail to eval redis script: %v, use in-process limiter for rescue", resp)
+		logx.GlobalLogger().Errorf("fail to eval redis script: %v, use in-process limiter for rescue", resp)
 		lim.startMonitor()
 		return lim.rescueLimiter.AllowN(now, n)
 	}

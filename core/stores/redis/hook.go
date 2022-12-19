@@ -151,7 +151,7 @@ func logDuration(ctx context.Context, cmds []red.Cmder, duration time.Duration) 
 		}
 		buf.WriteString(build.String())
 	}
-	logx.WithContext(ctx).WithDuration(duration).Slowf("[REDIS] slowcall on executing: %s", buf.String())
+	logx.FromCtx(ctx).WithDuration(duration).Slowf("[REDIS] slowcall on executing: %s", buf.String())
 }
 
 func (h hook) startSpan(ctx context.Context, cmds ...red.Cmder) context.Context {

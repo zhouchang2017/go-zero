@@ -58,10 +58,10 @@ func (s *SheddingStat) loop(c <-chan time.Time) {
 
 		c := stat.CpuUsage()
 		if st.Drop == 0 {
-			logx.Statf("(%s) shedding_stat [1m], cpu: %d, total: %d, pass: %d, drop: %d",
+			logx.GlobalLogger().Infof("(%s) shedding_stat [1m], cpu: %d, total: %d, pass: %d, drop: %d",
 				s.name, c, st.Total, st.Pass, st.Drop)
 		} else {
-			logx.Statf("(%s) shedding_stat_drop [1m], cpu: %d, total: %d, pass: %d, drop: %d",
+			logx.GlobalLogger().Infof("(%s) shedding_stat_drop [1m], cpu: %d, total: %d, pass: %d, drop: %d",
 				s.name, c, st.Total, st.Pass, st.Drop)
 		}
 	}

@@ -10,13 +10,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/discov/internal"
 	"github.com/zeromicro/go-zero/core/lang"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stringx"
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
 func init() {
-	logx.Disable()
+	// logx.Disable()
 }
 
 func TestPublisher_register(t *testing.T) {

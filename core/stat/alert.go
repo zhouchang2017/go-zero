@@ -24,7 +24,7 @@ const (
 )
 
 var (
-	reporter     = logx.Alert
+	reporter     = logx.GlobalLogger().Infof
 	lock         sync.RWMutex
 	lessExecutor = executors.NewLessExecutor(time.Minute * 5)
 	dropped      int32

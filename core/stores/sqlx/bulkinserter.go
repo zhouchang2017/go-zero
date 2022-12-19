@@ -131,7 +131,7 @@ func (in *dbInserter) Execute(bulk interface{}) {
 	if in.resultHandler != nil {
 		in.resultHandler(result, err)
 	} else if err != nil {
-		logx.Errorf("sql: %s, error: %s", stmt, err)
+		logx.GlobalLogger().Errorf("sql: %s, error: %s", stmt, err)
 	}
 }
 

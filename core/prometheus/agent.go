@@ -32,9 +32,9 @@ func StartAgent(c Config) {
 		threading.GoSafe(func() {
 			http.Handle(c.Path, promhttp.Handler())
 			addr := fmt.Sprintf("%s:%d", c.Host, c.Port)
-			logx.Infof("Starting prometheus agent at %s", addr)
+			logx.GlobalLogger().Infof("Starting prometheus agent at %s", addr)
 			if err := http.ListenAndServe(addr, nil); err != nil {
-				logx.Error(err)
+				logx.GlobalLogger().Error(err)
 			}
 		})
 	})

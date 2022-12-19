@@ -65,7 +65,7 @@ func (rl *RedisLock) AcquireCtx(ctx context.Context) (bool, error) {
 	if err == red.Nil {
 		return false, nil
 	} else if err != nil {
-		logx.Errorf("Error on acquiring lock for %s, %s", rl.key, err.Error())
+		logx.GlobalLogger().Errorf("Error on acquiring lock for %s, %s", rl.key, err.Error())
 		return false, err
 	} else if resp == nil {
 		return false, nil
@@ -76,7 +76,7 @@ func (rl *RedisLock) AcquireCtx(ctx context.Context) (bool, error) {
 		return true, nil
 	}
 
-	logx.Errorf("Unknown reply when acquiring lock for %s: %v", rl.key, resp)
+	logx.GlobalLogger().Errorf("Unknown reply when acquiring lock for %s: %v", rl.key, resp)
 	return false, nil
 }
 

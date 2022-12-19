@@ -21,11 +21,12 @@ type (
 
 	// ApiSpec describes an api file
 	ApiSpec struct {
-		Info    Info
-		Syntax  ApiSyntax
-		Imports []Import
-		Types   []Type
-		Service Service
+		Info         Info
+		Syntax       ApiSyntax
+		Imports      []Import
+		Types        []Type
+		Service      Service
+		ContainsTime bool
 	}
 
 	// Import describes api import
@@ -107,6 +108,7 @@ type (
 	// PrimitiveType describes the basic golang type, such as bool,int32,int64, ...
 	PrimitiveType struct {
 		RawName string
+		IsTime  bool
 	}
 
 	// MapType describes a map for api

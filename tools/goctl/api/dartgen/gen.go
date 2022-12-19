@@ -56,7 +56,7 @@ func DartCommand(_ *cobra.Command, _ []string) error {
 	logx.Must(genApi(dir+"api/", api, isLegacy))
 	logx.Must(genVars(dir+"vars/", isLegacy, hostname))
 	if err := formatDir(dir); err != nil {
-		logx.Errorf("failed to format, %v", err)
+		logx.GlobalLogger().Errorf("failed to format, %v", err)
 	}
 	return nil
 }

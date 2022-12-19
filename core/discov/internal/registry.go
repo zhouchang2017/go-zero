@@ -203,7 +203,7 @@ func (c *cluster) handleWatchEvents(key string, events []*clientv3.Event) {
 				})
 			}
 		default:
-			logx.Errorf("Unknown event type: %v", ev.Type)
+			logx.GlobalLogger().Errorf("Unknown event type: %v", ev.Type)
 		}
 	}
 }
@@ -219,7 +219,7 @@ func (c *cluster) load(cli EtcdClient, key string) int64 {
 			break
 		}
 
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 		time.Sleep(coolDownInterval)
 	}
 
@@ -307,15 +307,15 @@ func (c *cluster) watchStream(cli EtcdClient, key string, rev int64) bool {
 		select {
 		case wresp, ok := <-rch:
 			if !ok {
-				logx.Error("etcd monitor chan has been closed")
+				logx.GlobalLogger().Error("etcd monitor chan has been closed")
 				return false
 			}
 			if wresp.Canceled {
-				logx.Errorf("etcd monitor chan has been canceled, error: %v", wresp.Err())
+				logx.GlobalLogger().Errorf("etcd monitor chan has been canceled, error: %v", wresp.Err())
 				return false
 			}
 			if wresp.Err() != nil {
-				logx.Error(fmt.Sprintf("etcd monitor chan error: %v", wresp.Err()))
+				logx.GlobalLogger().Error(fmt.Sprintf("etcd monitor chan error: %v", wresp.Err()))
 				return false
 			}
 

@@ -64,7 +64,7 @@ func (s *Stat) statLoop() {
 		percent := 100 * float32(hit) / float32(total)
 		miss := atomic.SwapUint64(&s.Miss, 0)
 		dbf := atomic.SwapUint64(&s.DbFails, 0)
-		logx.Statf("dbcache(%s) - qpm: %d, hit_ratio: %.1f%%, hit: %d, miss: %d, db_fails: %d",
+		logx.GlobalLogger().Infof("dbcache(%s) - qpm: %d, hit_ratio: %.1f%%, hit: %d, miss: %d, db_fails: %d",
 			s.name, total, percent, hit, miss, dbf)
 	}
 }

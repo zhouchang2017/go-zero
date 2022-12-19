@@ -96,17 +96,17 @@ func (p *Publisher) keepAliveAsync(cli internal.EtcdClient) error {
 				if !ok {
 					p.revoke(cli)
 					if err := p.KeepAlive(); err != nil {
-						logx.Errorf("KeepAlive: %s", err.Error())
+						logx.GlobalLogger().Errorf("KeepAlive: %s", err.Error())
 					}
 					return
 				}
 			case <-p.pauseChan:
-				logx.Infof("paused etcd renew, key: %s, value: %s", p.key, p.value)
+				logx.GlobalLogger().Infof("paused etcd renew, key: %s, value: %s", p.key, p.value)
 				p.revoke(cli)
 				select {
 				case <-p.resumeChan:
 					if err := p.KeepAlive(); err != nil {
-						logx.Errorf("KeepAlive: %s", err.Error())
+						logx.GlobalLogger().Errorf("KeepAlive: %s", err.Error())
 					}
 					return
 				case <-p.quit.Done():
@@ -141,7 +141,7 @@ func (p *Publisher) register(client internal.EtcdClient) (clientv3.LeaseID, erro
 
 func (p *Publisher) revoke(cli internal.EtcdClient) {
 	if _, err := cli.Revoke(cli.Ctx(), p.lease); err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 	}
 }
 
@@ -162,6 +162,8 @@ func WithPubEtcdAccount(user, pass string) PubOption {
 // WithPubEtcdTLS provides the etcd CertFile/CertKeyFile/CACertFile.
 func WithPubEtcdTLS(certFile, certKeyFile, caFile string, insecureSkipVerify bool) PubOption {
 	return func(pub *Publisher) {
-		logx.Must(RegisterTLS(pub.endpoints, certFile, certKeyFile, caFile, insecureSkipVerify))
+		if err := RegisterTLS(pub.endpoints, certFile, certKeyFile, caFile, insecureSkipVerify); err != nil {
+			logx.GlobalLogger().Panic(err)
+		}
 	}
 }

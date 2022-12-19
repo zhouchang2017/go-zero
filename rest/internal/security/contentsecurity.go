@@ -123,7 +123,7 @@ func VerifySignature(r *http.Request, securityHeader *ContentSecurityHeader, tol
 		return httpx.CodeSignaturePass
 	}
 
-	logx.Infof("signature different, expect: %s, actual: %s",
+	logx.GlobalLogger().Infof("signature different, expect: %s, actual: %s",
 		securityHeader.Signature, actualSignature)
 
 	return httpx.CodeSignatureInvalidToken

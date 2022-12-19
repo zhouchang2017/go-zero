@@ -28,7 +28,7 @@ const (
 // A ServiceConf is a service config.
 type ServiceConf struct {
 	Name       string
-	Log        logx.LogConf
+	Logs       logx.LogConfigMap
 	Mode       string `json:",default=pro,options=dev|test|rt|pre|pro"`
 	MetricsUrl string `json:",optional"`
 	// Deprecated: please use DevServer
@@ -46,10 +46,7 @@ func (sc ServiceConf) MustSetUp() {
 
 // SetUp sets up the service.
 func (sc ServiceConf) SetUp() error {
-	if len(sc.Log.ServiceName) == 0 {
-		sc.Log.ServiceName = sc.Name
-	}
-	if err := logx.SetUp(sc.Log); err != nil {
+	if err := sc.Logs.Init(); err != nil {
 		return err
 	}
 

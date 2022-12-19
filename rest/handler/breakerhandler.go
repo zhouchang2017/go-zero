@@ -22,7 +22,7 @@ func BreakerHandler(method, path string, metrics *stat.Metrics) func(http.Handle
 			promise, err := brk.Allow()
 			if err != nil {
 				metrics.AddDrop()
-				logx.Errorf("[http] dropped, %s - %s - %s",
+				logx.GlobalLogger().Errorf("[http] dropped, %s - %s - %s",
 					r.RequestURI, httpx.GetRemoteAddr(r), r.UserAgent())
 				w.WriteHeader(http.StatusServiceUnavailable)
 				return

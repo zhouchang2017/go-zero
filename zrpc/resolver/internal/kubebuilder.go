@@ -59,7 +59,7 @@ func (b *kubeBuilder) Build(target resolver.Target, cc resolver.ClientConn,
 		if err := cc.UpdateState(resolver.State{
 			Addresses: addrs,
 		}); err != nil {
-			logx.Error(err)
+			logx.GlobalLogger().Error(err)
 		}
 	})
 	inf := informers.NewSharedInformerFactoryWithOptions(cs, resyncInterval,

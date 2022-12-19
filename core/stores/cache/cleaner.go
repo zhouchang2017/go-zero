@@ -63,7 +63,7 @@ func clean(key, value interface{}) {
 		} else {
 			msg := fmt.Sprintf("retried but failed to clear cache with keys: %q, error: %v",
 				formatKeys(dt.keys), err)
-			logx.Error(msg)
+			logx.GlobalLogger().Error(msg)
 			stat.Report(msg)
 		}
 	})

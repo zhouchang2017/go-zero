@@ -3,12 +3,12 @@ package load
 import (
 	"errors"
 	"fmt"
+	"github.com/zeromicro/go-zero/core/logx"
 	"math"
 	"sync/atomic"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/collection"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stat"
 	"github.com/zeromicro/go-zero/core/syncx"
 	"github.com/zeromicro/go-zero/core/timex"
@@ -200,7 +200,7 @@ func (as *adaptiveShedder) shouldDrop() bool {
 			msg := fmt.Sprintf(
 				"dropreq, cpu: %d, maxPass: %d, minRt: %.2f, hot: %t, flying: %d, avgFlying: %.2f",
 				stat.CpuUsage(), as.maxPass(), as.minRt(), as.stillHot(), flying, avgFlying)
-			logx.Error(msg)
+			logx.GlobalLogger().Error(msg)
 			stat.Report(msg)
 			return true
 		}

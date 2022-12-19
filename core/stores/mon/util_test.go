@@ -3,12 +3,11 @@ package mon
 import (
 	"context"
 	"errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/core/logx"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 func TestFormatAddrs(t *testing.T) {
@@ -41,14 +40,7 @@ func TestFormatAddrs(t *testing.T) {
 
 func Test_logDuration(t *testing.T) {
 	var buf strings.Builder
-	w := logx.NewWriter(&buf)
-	o := logx.Reset()
-	logx.SetWriter(w)
-
-	defer func() {
-		logx.Reset()
-		logx.SetWriter(o)
-	}()
+	logger = logx.NewTestLogger(&buf)
 
 	buf.Reset()
 	logDuration(context.Background(), "foo", "bar", time.Millisecond, nil)

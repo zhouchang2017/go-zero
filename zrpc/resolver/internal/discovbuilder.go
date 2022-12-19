@@ -31,7 +31,7 @@ func (b *discovBuilder) Build(target resolver.Target, cc resolver.ClientConn, _ 
 		if err := cc.UpdateState(resolver.State{
 			Addresses: addrs,
 		}); err != nil {
-			logx.Error(err)
+			logx.GlobalLogger().Error(err)
 		}
 	}
 	sub.AddListener(update)

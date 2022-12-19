@@ -49,7 +49,10 @@ func MustNewServer(c GatewayConf, opts ...Option) *Server {
 
 // Start starts the gateway server.
 func (s *Server) Start() {
-	logx.Must(s.build())
+	err := s.build()
+	if err != nil {
+		logx.GlobalLogger().Panic(err)
+	}
 	s.Server.Start()
 }
 

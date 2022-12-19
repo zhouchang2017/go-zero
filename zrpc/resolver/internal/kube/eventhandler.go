@@ -27,7 +27,7 @@ func NewEventHandler(update func([]string)) *EventHandler {
 func (h *EventHandler) OnAdd(obj interface{}) {
 	endpoints, ok := obj.(*v1.Endpoints)
 	if !ok {
-		logx.Errorf("%v is not an object with type *v1.Endpoints", obj)
+		logx.GlobalLogger().Errorf("%v is not an object with type *v1.Endpoints", obj)
 		return
 	}
 
@@ -53,7 +53,7 @@ func (h *EventHandler) OnAdd(obj interface{}) {
 func (h *EventHandler) OnDelete(obj interface{}) {
 	endpoints, ok := obj.(*v1.Endpoints)
 	if !ok {
-		logx.Errorf("%v is not an object with type *v1.Endpoints", obj)
+		logx.GlobalLogger().Errorf("%v is not an object with type *v1.Endpoints", obj)
 		return
 	}
 
@@ -79,13 +79,13 @@ func (h *EventHandler) OnDelete(obj interface{}) {
 func (h *EventHandler) OnUpdate(oldObj, newObj interface{}) {
 	oldEndpoints, ok := oldObj.(*v1.Endpoints)
 	if !ok {
-		logx.Errorf("%v is not an object with type *v1.Endpoints", oldObj)
+		logx.GlobalLogger().Errorf("%v is not an object with type *v1.Endpoints", oldObj)
 		return
 	}
 
 	newEndpoints, ok := newObj.(*v1.Endpoints)
 	if !ok {
-		logx.Errorf("%v is not an object with type *v1.Endpoints", newObj)
+		logx.GlobalLogger().Errorf("%v is not an object with type *v1.Endpoints", newObj)
 		return
 	}
 

@@ -1,23 +1,15 @@
 package proc
 
 import (
-	"strings"
-	"testing"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/logx"
+	"strings"
+	"testing"
 )
 
 func TestProfile(t *testing.T) {
 	var buf strings.Builder
-	w := logx.NewWriter(&buf)
-	o := logx.Reset()
-	logx.SetWriter(w)
-
-	defer func() {
-		logx.Reset()
-		logx.SetWriter(o)
-	}()
+	logger = logx.NewTestLogger(&buf)
 
 	profiler := StartProfile()
 	// start again should not work

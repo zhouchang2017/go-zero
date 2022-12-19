@@ -18,7 +18,7 @@ type PingLogic struct {
 
 func NewPingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PingLogic {
 	return &PingLogic{
-		Logger: logx.WithContext(ctx),
+		Logger: logx.FromCtx(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}

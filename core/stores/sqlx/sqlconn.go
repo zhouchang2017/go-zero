@@ -119,7 +119,7 @@ func NewSqlConnFromDB(db *sql.DB, opts ...SqlOption) SqlConn {
 			return db, nil
 		},
 		onError: func(err error) {
-			logx.Errorf("Error on getting sql instance: %v", err)
+			logx.GlobalLogger().Errorf("Error on getting sql instance: %v", err)
 		},
 		beginTx: begin,
 		brk:     breaker.NewBreaker(),

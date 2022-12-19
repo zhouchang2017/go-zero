@@ -65,9 +65,9 @@ func (s *Server) StartAsync() {
 	s.addRoutes()
 	threading.GoSafe(func() {
 		addr := fmt.Sprintf("%s:%d", s.config.Host, s.config.Port)
-		logx.Infof("Starting dev http server at %s", addr)
+		logx.GlobalLogger().Infof("Starting dev http server at %s", addr)
 		if err := http.ListenAndServe(addr, s.server); err != nil {
-			logx.Error(err)
+			logx.GlobalLogger().Error(err)
 		}
 	})
 }

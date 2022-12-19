@@ -35,6 +35,7 @@ type (
 		name       string
 		collection internal.MgoCollection
 		brk        breaker.Breaker
+		logger     logx.Logger
 	}
 
 	keepablePromise struct {
@@ -48,6 +49,7 @@ func newCollection(collection *mgo.Collection, brk breaker.Breaker) Collection {
 		name:       collection.FullName,
 		collection: collection,
 		brk:        brk,
+		logger:     logx.GlobalLogger(),
 	}
 }
 
@@ -201,21 +203,21 @@ func (c *decoratedCollection) Upsert(selector, update interface{}) (info *mgo.Ch
 func (c *decoratedCollection) logDuration(method string, duration time.Duration, err error, docs ...interface{}) {
 	content, e := json.Marshal(docs)
 	if e != nil {
-		logx.Error(err)
+		c.logger.Error(err)
 	} else if err != nil {
 		if duration > slowThreshold.Load() {
-			logx.WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - fail(%s) - %s",
+			c.logger.WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - fail(%s) - %s",
 				c.name, method, err.Error(), string(content))
 		} else {
-			logx.WithDuration(duration).Infof("mongo(%s) - %s - fail(%s) - %s",
+			c.logger.WithDuration(duration).Infof("mongo(%s) - %s - fail(%s) - %s",
 				c.name, method, err.Error(), string(content))
 		}
 	} else {
 		if duration > slowThreshold.Load() {
-			logx.WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - ok - %s",
+			c.logger.WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - ok - %s",
 				c.name, method, string(content))
 		} else {
-			logx.WithDuration(duration).Infof("mongo(%s) - %s - ok - %s", c.name, method, string(content))
+			c.logger.WithDuration(duration).Infof("mongo(%s) - %s - ok - %s", c.name, method, string(content))
 		}
 	}
 }

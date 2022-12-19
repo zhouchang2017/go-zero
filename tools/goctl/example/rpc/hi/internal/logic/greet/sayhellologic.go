@@ -19,7 +19,7 @@ func NewSayHelloLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SayHello
 	return &SayHelloLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
-		Logger: logx.WithContext(ctx),
+		Logger: logx.FromCtx(ctx),
 	}
 }
 

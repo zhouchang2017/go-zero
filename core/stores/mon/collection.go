@@ -503,7 +503,7 @@ func (c *decoratedCollection) UpdateOne(ctx context.Context, filter, update inte
 func (c *decoratedCollection) logDuration(ctx context.Context, method string,
 	startTime time.Duration, err error, docs ...interface{}) {
 	duration := timex.Since(startTime)
-	logger := logx.WithContext(ctx).WithDuration(duration)
+	logger := logx.FromCtx(ctx).WithDuration(duration)
 
 	content, jerr := json.Marshal(docs)
 	// jerr should not be non-nil, but we don't care much on this,

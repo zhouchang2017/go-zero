@@ -19,7 +19,7 @@ func NewAskQuestionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AskQu
 	return &AskQuestionLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
-		Logger: logx.WithContext(ctx),
+		Logger: logx.FromCtx(ctx),
 	}
 }
 

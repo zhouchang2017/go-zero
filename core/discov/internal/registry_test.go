@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/contextx"
 	"github.com/zeromicro/go-zero/core/lang"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stringx"
 	"go.etcd.io/etcd/api/v3/etcdserverpb"
 	"go.etcd.io/etcd/api/v3/mvccpb"
@@ -19,7 +18,7 @@ import (
 var mockLock sync.Mutex
 
 func init() {
-	logx.Disable()
+	// logx.Disable()
 }
 
 func setMockClient(cli EtcdClient) func() {

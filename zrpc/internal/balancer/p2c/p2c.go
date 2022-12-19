@@ -178,7 +178,7 @@ func (p *p2cPicker) logStats() {
 			conn.addr.Addr, conn.load(), atomic.SwapInt64(&conn.requests, 0)))
 	}
 
-	logx.Statf("p2c - %s", strings.Join(stats, "; "))
+	logx.GlobalLogger().Infof("p2c - %s", strings.Join(stats, "; "))
 }
 
 type subConn struct {

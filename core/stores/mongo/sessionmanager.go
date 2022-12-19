@@ -49,7 +49,7 @@ func getConcurrentSession(url string) (*concurrentSession, error) {
 
 func (cs *concurrentSession) putSession(session *mgo.Session) {
 	if err := cs.limit.Return(); err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 	}
 
 	// anyway, we need to close the session

@@ -70,6 +70,8 @@ func genLogicByRoute(dir, rootPkg string, cfg *config.Config, group spec.Group, 
 			"responseType": responseString,
 			"returnString": returnString,
 			"request":      requestString,
+			"HandlerDoc":   docToString(route.HandlerDoc),
+			"HandlerName":  strings.Title(route.Handler),
 		},
 	})
 }

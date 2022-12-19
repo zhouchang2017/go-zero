@@ -71,7 +71,7 @@ func flushRepeatly() {
 	threading.GoSafe(func() {
 		for {
 			time.Sleep(flushInterval)
-			logx.Stat(generateReport())
+			logx.GlobalLogger().Infof(generateReport())
 		}
 	})
 }

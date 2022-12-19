@@ -45,7 +45,7 @@ func start(host string, port int, handler http.Handler, run func(svr *http.Serve
 	waitForCalled := proc.AddWrapUpListener(func() {
 		healthManager.MarkNotReady()
 		if e := server.Shutdown(context.Background()); e != nil {
-			logx.Error(e)
+			logx.GlobalLogger().Error(e)
 		}
 	})
 	defer func() {

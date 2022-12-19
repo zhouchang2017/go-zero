@@ -132,12 +132,12 @@ func format(query string, args ...interface{}) (string, error) {
 
 func logInstanceError(datasource string, err error) {
 	datasource = desensitize(datasource)
-	logx.Errorf("Error on getting sql instance of %s: %v", datasource, err)
+	logx.GlobalLogger().Errorf("Error on getting sql instance of %s: %v", datasource, err)
 }
 
 func logSqlError(ctx context.Context, stmt string, err error) {
 	if err != nil && err != ErrNotFound {
-		logx.WithContext(ctx).Errorf("stmt: %s, error: %s", stmt, err.Error())
+		logx.FromCtx(ctx).Errorf("stmt: %s, error: %s", stmt, err.Error())
 	}
 }
 

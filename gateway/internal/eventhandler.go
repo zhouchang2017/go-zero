@@ -29,7 +29,7 @@ func NewEventHandler(writer io.Writer, resolver jsonpb.AnyResolver) *EventHandle
 
 func (h *EventHandler) OnReceiveResponse(message proto.Message) {
 	if err := h.marshaler.Marshal(h.writer, message); err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 	}
 }
 

@@ -37,6 +37,6 @@ func handleCrash(handler func(interface{})) {
 }
 
 func toPanicError(r interface{}) error {
-	logx.Errorf("%+v\n\n%s", r, debug.Stack())
+	logx.GlobalLogger().Errorf("%+v\n\n%s", r, debug.Stack())
 	return status.Errorf(codes.Internal, "panic: %v", r)
 }

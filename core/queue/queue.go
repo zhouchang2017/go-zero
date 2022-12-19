@@ -125,7 +125,7 @@ func (q *Queue) consume(eventChan chan interface{}) {
 	for {
 		var err error
 		if consumer, err = q.consumerFactory(); err != nil {
-			logx.Errorf("Error on creating consumer: %v", err)
+			logx.GlobalLogger().Errorf("Error on creating consumer: %v", err)
 			time.Sleep(time.Second)
 		} else {
 			break
@@ -138,7 +138,7 @@ func (q *Queue) consume(eventChan chan interface{}) {
 			if ok {
 				q.consumeOne(consumer, message)
 			} else {
-				logx.Info("Task channel was closed, quitting consumer...")
+				logx.GlobalLogger().Info("Task channel was closed, quitting consumer...")
 				return
 			}
 		case event := <-eventChan:
@@ -155,11 +155,11 @@ func (q *Queue) consumeOne(consumer Consumer, message string) {
 			q.metrics.Add(stat.Task{
 				Duration: duration,
 			})
-			logx.WithDuration(duration).Infof("%s", message)
+			logx.GlobalLogger().WithDuration(duration).Infof("%s", message)
 		}()
 
 		if err := consumer.Consume(message); err != nil {
-			logx.Errorf("Error occurred while consuming %v: %v", message, err)
+			logx.GlobalLogger().Errorf("Error occurred while consuming %v: %v", message, err)
 		}
 	})
 }
@@ -176,7 +176,7 @@ func (q *Queue) produce() {
 	for {
 		var err error
 		if producer, err = q.producerFactory(); err != nil {
-			logx.Errorf("Error on creating producer: %v", err)
+			logx.GlobalLogger().Errorf("Error on creating producer: %v", err)
 			time.Sleep(time.Second)
 		} else {
 			break
@@ -191,7 +191,7 @@ func (q *Queue) produce() {
 	for {
 		select {
 		case <-q.quit:
-			logx.Info("Quitting producer")
+			logx.GlobalLogger().Info("Quitting producer")
 			return
 		default:
 			if v, ok := q.produceOne(producer); ok {

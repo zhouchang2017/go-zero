@@ -11,6 +11,8 @@ import (
 
 const mongoAddrSep = ","
 
+var logger = logx.GlobalLogger()
+
 // FormatAddr formats mongo hosts to a string.
 func FormatAddr(hosts []string) string {
 	return strings.Join(hosts, mongoAddrSep)
@@ -18,7 +20,7 @@ func FormatAddr(hosts []string) string {
 
 func logDuration(ctx context.Context, name, method string, startTime time.Duration, err error) {
 	duration := timex.Since(startTime)
-	logger := logx.WithContext(ctx).WithDuration(duration)
+	logger := logx.FromCtx(ctx).WithDuration(duration)
 	if err != nil {
 		logger.Infof("mongo(%s) - %s - fail(%s)", name, method, err.Error())
 	} else {

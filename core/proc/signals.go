@@ -7,8 +7,6 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const timeFormat = "0102150405"
@@ -45,7 +43,7 @@ func init() {
 
 				gracefulStop(signals)
 			default:
-				logx.Error("Got unregistered signal:", v)
+				logger.Error("Got unregistered signal:", v)
 			}
 		}
 	}()

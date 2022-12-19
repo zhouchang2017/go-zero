@@ -72,7 +72,7 @@ func (c cacheNode) DelCtx(ctx context.Context, keys ...string) error {
 		return nil
 	}
 
-	logger := logx.WithContext(ctx)
+	logger := logx.FromCtx(ctx)
 	if len(keys) > 1 && c.rds.Type == redis.ClusterType {
 		for _, key := range keys {
 			if _, err := c.rds.DelCtx(ctx, key); err != nil {
@@ -207,7 +207,7 @@ func (c cacheNode) doGetCache(ctx context.Context, key string, v interface{}) er
 
 func (c cacheNode) doTake(ctx context.Context, v interface{}, key string,
 	query func(v interface{}) error, cacheVal func(v interface{}) error) error {
-	logger := logx.WithContext(ctx)
+	logger := logx.FromCtx(ctx)
 	val, fresh, err := c.barrier.DoEx(key, func() (interface{}, error) {
 		if err := c.doGetCache(ctx, key, v); err != nil {
 			if err == errPlaceholder {
@@ -263,7 +263,7 @@ func (c cacheNode) processCache(ctx context.Context, key, data string, v interfa
 
 	report := fmt.Sprintf("unmarshal cache, node: %s, key: %s, value: %s, error: %v",
 		c.rds.Addr, key, data, err)
-	logger := logx.WithContext(ctx)
+	logger := logx.FromCtx(ctx)
 	logger.Error(report)
 	stat.Report(report)
 	if _, e := c.rds.DelCtx(ctx, key); e != nil {

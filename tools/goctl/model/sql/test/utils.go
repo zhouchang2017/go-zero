@@ -87,6 +87,6 @@ func format(query string, args ...interface{}) (string, error) {
 
 func logSqlError(stmt string, err error) {
 	if err != nil && err != ErrNotFound {
-		logx.Errorf("stmt: %s, error: %s", stmt, err.Error())
+		logx.GlobalLogger().Errorf("stmt: %s, error: %s", stmt, err.Error())
 	}
 }

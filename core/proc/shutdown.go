@@ -10,7 +10,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/threading"
 )
 
@@ -46,14 +45,14 @@ func SetTimeToForceQuit(duration time.Duration) {
 func gracefulStop(signals chan os.Signal) {
 	signal.Stop(signals)
 
-	logx.Info("Got signal SIGTERM, shutting down...")
+	logger.Info("Got signal SIGTERM, shutting down...")
 	go wrapUpListeners.notifyListeners()
 
 	time.Sleep(wrapUpTime)
 	go shutdownListeners.notifyListeners()
 
 	time.Sleep(delayTimeBeforeForceQuit - wrapUpTime)
-	logx.Infof("Still alive after %v, going to force kill the process...", delayTimeBeforeForceQuit)
+	logger.Infof("Still alive after %v, going to force kill the process...", delayTimeBeforeForceQuit)
 	syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
 }
 

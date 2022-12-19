@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -24,9 +25,8 @@ const (
 package handler
 
 import (
-	"net/http"{{if .hasTimeout}}
+	{{if .hasTimeout}}
 	"time"{{end}}
-
 	{{.importPackages}}
 )
 
@@ -64,17 +64,97 @@ type (
 		middlewares      []string
 		prefix           string
 		jwtTrans         string
+		actionRouteName  string
 	}
 	route struct {
-		method  string
-		path    string
-		handler string
+		method          string
+		path            string
+		handler         string
+		handlerName     string
+		actionRouteName string
+
+		HandlerDoc     string
+		HandlerComment string
+		Doc            string
+		Comment        string
 	}
 )
 
+func writeRouters(gt *template.Template, builder *strings.Builder, g group) (hasTimeout bool, err error) {
+	var gbuilder strings.Builder
+	gbuilder.WriteString("[]rest.Route{")
+	for _, r := range g.routes {
+		fmt.Fprintf(&gbuilder, `
+		{
+			Method:  %s,
+			Path:    "%s",
+			Handler: %s,
+		},`,
+			r.method, r.path, r.handler)
+	}
+
+	var jwt string
+	if g.jwtEnabled {
+		jwt = fmt.Sprintf("\n rest.WithJwt(serverCtx.Config.%s.AccessSecret),", g.authName)
+	}
+	if len(g.jwtTrans) > 0 {
+		jwt = jwt + fmt.Sprintf("\n rest.WithJwtTransition(serverCtx.Config.%s.PrevSecret,serverCtx.Config.%s.Secret),", g.jwtTrans, g.jwtTrans)
+	}
+	var signature, prefix string
+	if g.signatureEnabled {
+		signature = "\n rest.WithSignature(serverCtx.Config.Signature),"
+	}
+	if len(g.prefix) > 0 {
+		prefix = fmt.Sprintf(`
+rest.WithPrefix("%s"),`, g.prefix)
+	}
+
+	var timeout string
+	if len(g.timeout) > 0 {
+		duration, err := time.ParseDuration(g.timeout)
+		if err != nil {
+			return hasTimeout, err
+		}
+
+		// why we check this, maybe some users set value 1, it's 1ns, not 1s.
+		if duration < timeoutThreshold {
+			return hasTimeout, fmt.Errorf("timeout should not less than 1ms, now %v", duration)
+		}
+
+		timeout = fmt.Sprintf("rest.WithTimeout(%d * time.Millisecond),", duration/time.Millisecond)
+		hasTimeout = true
+	}
+
+	var routes string
+	if len(g.middlewares) > 0 {
+		gbuilder.WriteString("\n}...,")
+		params := g.middlewares
+		for i := range params {
+			params[i] = "serverCtx." + params[i]
+		}
+		middlewareStr := strings.Join(params, ", ")
+		routes = fmt.Sprintf("rest.WithMiddlewares(\n[]rest.Middleware{ %s }, \n %s \n),",
+			middlewareStr, strings.TrimSpace(gbuilder.String()))
+	} else {
+		gbuilder.WriteString("\n},")
+		routes = strings.TrimSpace(gbuilder.String())
+	}
+
+	if err := gt.Execute(builder, map[string]string{
+		"routes":    routes,
+		"jwt":       jwt,
+		"signature": signature,
+		"prefix":    prefix,
+		"timeout":   timeout,
+	}); err != nil {
+		return hasTimeout, err
+	}
+	return hasTimeout, nil
+}
+
 func genRoutes(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 	var builder strings.Builder
-	groups, err := getRoutes(api)
+	groups, _, err := getRoutes(api)
 	if err != nil {
 		return err
 	}
@@ -83,76 +163,46 @@ func genRoutes(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error
 	if err != nil {
 		return err
 	}
-
 	var hasTimeout bool
+	var actionGroup []group
+	_actionGroupMap := map[string]struct{}{}
 	gt := template.Must(template.New("groupTemplate").Parse(templateText))
 	for _, g := range groups {
-		var gbuilder strings.Builder
-		gbuilder.WriteString("[]rest.Route{")
-		for _, r := range g.routes {
-			fmt.Fprintf(&gbuilder, `
-		{
-			Method:  %s,
-			Path:    "%s",
-			Handler: %s,
-		},`,
-				r.method, r.path, r.handler)
-		}
-
-		var jwt string
-		if g.jwtEnabled {
-			jwt = fmt.Sprintf("\n rest.WithJwt(serverCtx.Config.%s.AccessSecret),", g.authName)
-		}
-		if len(g.jwtTrans) > 0 {
-			jwt = jwt + fmt.Sprintf("\n rest.WithJwtTransition(serverCtx.Config.%s.PrevSecret,serverCtx.Config.%s.Secret),", g.jwtTrans, g.jwtTrans)
-		}
-		var signature, prefix string
-		if g.signatureEnabled {
-			signature = "\n rest.WithSignature(serverCtx.Config.Signature),"
-		}
-		if len(g.prefix) > 0 {
-			prefix = fmt.Sprintf(`
-rest.WithPrefix("%s"),`, g.prefix)
-		}
-
-		var timeout string
-		if len(g.timeout) > 0 {
-			duration, err := time.ParseDuration(g.timeout)
+		if g.actionRouteName != "" {
+			// action去重，同名action仅生成一条路由
+			if _, ok := _actionGroupMap[g.actionRouteName]; !ok {
+				_actionGroupMap[g.actionRouteName] = struct{}{}
+				a2 := newActionMap(g.actionRouteName)
+				actionGroup = append(actionGroup, group{
+					routes: []route{
+						{
+							method:          "http.MethodPost",
+							path:            fmt.Sprintf("/%s", g.actionRouteName),
+							handler:         fmt.Sprintf("%sHandler(serverCtx)", a2.actionTitle()),
+							actionRouteName: g.actionRouteName,
+						},
+					},
+					jwtEnabled:       g.jwtEnabled,
+					signatureEnabled: g.signatureEnabled,
+					authName:         g.authName,
+					timeout:          g.timeout,
+					middlewares:      g.middlewares,
+					prefix:           g.prefix,
+					jwtTrans:         g.jwtTrans,
+					actionRouteName:  g.actionRouteName,
+				})
+			}
+		} else {
+			hasTimeout, err = writeRouters(gt, &builder, g)
 			if err != nil {
 				return err
 			}
-
-			// why we check this, maybe some users set value 1, it's 1ns, not 1s.
-			if duration < timeoutThreshold {
-				return fmt.Errorf("timeout should not less than 1ms, now %v", duration)
-			}
-
-			timeout = fmt.Sprintf("rest.WithTimeout(%d * time.Millisecond),", duration/time.Millisecond)
-			hasTimeout = true
 		}
+	}
 
-		var routes string
-		if len(g.middlewares) > 0 {
-			gbuilder.WriteString("\n}...,")
-			params := g.middlewares
-			for i := range params {
-				params[i] = "serverCtx." + params[i]
-			}
-			middlewareStr := strings.Join(params, ", ")
-			routes = fmt.Sprintf("rest.WithMiddlewares(\n[]rest.Middleware{ %s }, \n %s \n),",
-				middlewareStr, strings.TrimSpace(gbuilder.String()))
-		} else {
-			gbuilder.WriteString("\n},")
-			routes = strings.TrimSpace(gbuilder.String())
-		}
-
-		if err := gt.Execute(&builder, map[string]string{
-			"routes":    routes,
-			"jwt":       jwt,
-			"signature": signature,
-			"prefix":    prefix,
-			"timeout":   timeout,
-		}); err != nil {
+	for _, g := range actionGroup {
+		hasTimeout, err = writeRouters(gt, &builder, g)
+		if err != nil {
 			return err
 		}
 	}
@@ -185,7 +235,13 @@ rest.WithPrefix("%s"),`, g.prefix)
 func genRouteImports(parentPkg string, api *spec.ApiSpec) string {
 	importSet := collection.NewSet()
 	importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)))
+	var hasRoute bool
 	for _, group := range api.Service.Groups {
+		action := group.GetAnnotation("action")
+		if action != "" {
+			hasRoute = true
+			continue
+		}
 		for _, route := range group.Routes {
 			folder := route.GetAnnotation(groupProperty)
 			if len(folder) == 0 {
@@ -194,38 +250,64 @@ func genRouteImports(parentPkg string, api *spec.ApiSpec) string {
 					continue
 				}
 			}
+			hasRoute = true
 			importSet.AddStr(fmt.Sprintf("%s \"%s\"", toPrefix(folder),
 				pathx.JoinPackages(parentPkg, handlerDir, folder)))
 		}
 	}
+	if hasRoute {
+		importSet.AddStr(strconv.Quote("net/http"))
+	}
 	imports := importSet.KeysStr()
 	sort.Strings(imports)
+
 	projectSection := strings.Join(imports, "\n\t")
 	depSection := fmt.Sprintf("\"%s/rest\"", vars.ProjectOpenSourceURL)
 	return fmt.Sprintf("%s\n\n\t%s", projectSection, depSection)
 }
 
-func getRoutes(api *spec.ApiSpec) ([]group, error) {
+func getRoutes(api *spec.ApiSpec) ([]group, []string, error) {
 	var routes []group
+	var actions []string
+	var _actionMap = map[string]struct{}{}
 
 	for _, g := range api.Service.Groups {
+		if action := g.GetAnnotation("action"); action != "" {
+			if _, ok := _actionMap[action]; !ok {
+				_actionMap[action] = struct{}{}
+				actions = append(actions, action)
+			}
+		}
 		var groupedRoutes group
+		groupedRoutes.actionRouteName = g.GetAnnotation("action")
 		for _, r := range g.Routes {
+			handlerName := getHandlerName(r)
 			handler := getHandlerName(r)
-			handler = handler + "(serverCtx)"
+			if groupedRoutes.actionRouteName == "" {
+				handler = handler + "(serverCtx)"
+			}
+
 			folder := r.GetAnnotation(groupProperty)
 			if len(folder) > 0 {
 				handler = toPrefix(folder) + "." + strings.ToUpper(handler[:1]) + handler[1:]
+				handlerName = toPrefix(folder) + "." + strings.ToUpper(handlerName[:1]) + handlerName[1:]
 			} else {
 				folder = g.GetAnnotation(groupProperty)
 				if len(folder) > 0 {
 					handler = toPrefix(folder) + "." + strings.ToUpper(handler[:1]) + handler[1:]
+					handlerName = toPrefix(folder) + "." + strings.ToUpper(handlerName[:1]) + handlerName[1:]
 				}
 			}
 			groupedRoutes.routes = append(groupedRoutes.routes, route{
-				method:  mapping[r.Method],
-				path:    r.Path,
-				handler: handler,
+				method:          mapping[r.Method],
+				path:            r.Path,
+				handler:         handler,
+				handlerName:     handlerName,
+				actionRouteName: g.GetAnnotation("action"),
+				HandlerDoc:      docToString(r.HandlerDoc),
+				HandlerComment:  docToString(r.HandlerComment),
+				Doc:             docToString(r.Doc),
+				Comment:         docToString(r.Comment),
 			})
 		}
 
@@ -260,9 +342,20 @@ func getRoutes(api *spec.ApiSpec) ([]group, error) {
 		routes = append(routes, groupedRoutes)
 	}
 
-	return routes, nil
+	return routes, actions, nil
 }
 
 func toPrefix(folder string) string {
 	return strings.ReplaceAll(folder, "/", "")
+}
+
+func docToString(doc []string) string {
+	var buf strings.Builder
+	for index, item := range doc {
+		buf.WriteString(item)
+		if index != len(doc)-1 {
+			buf.WriteByte('\n')
+		}
+	}
+	return buf.String()
 }

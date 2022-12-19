@@ -127,7 +127,7 @@ func init() {
 		"https://github.com/zeromicro/go-zero-template directory structure")
 	goCmd.Flags().StringVar(&gogen.VarStringBranch, "branch", "", "The branch of "+
 		"the remote repo, it does work with --remote")
-	goCmd.Flags().StringVar(&gogen.VarStringStyle, "style", "gozero", "The file naming format,"+
+	goCmd.Flags().StringVar(&gogen.VarStringStyle, "style", "go_zero", "The file naming format,"+
 		" see [https://github.com/zeromicro/go-zero/blob/master/tools/goctl/config/readme.md]")
 
 	javaCmd.Flags().StringVar(&javagen.VarStringDir, "dir", "", "The target dir")

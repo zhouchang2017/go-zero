@@ -56,12 +56,12 @@ type (
 
 func (bridge *clientBridge) Close() {
 	if err := bridge.Client.Close(); err != nil {
-		logx.Errorf("Error occurred on close redis client: %s", err)
+		logx.GlobalLogger().Errorf("Error occurred on close redis client: %s", err)
 	}
 }
 
 func (bridge *clusterBridge) Close() {
 	if err := bridge.ClusterClient.Close(); err != nil {
-		logx.Errorf("Error occurred on close redis cluster: %s", err)
+		logx.GlobalLogger().Errorf("Error occurred on close redis cluster: %s", err)
 	}
 }

@@ -47,10 +47,10 @@ func TestHookProcessCase2(t *testing.T) {
 	})
 	defer ztrace.StopAgent()
 
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	ctx, err := durationHook.BeforeProcess(context.Background(), red.NewCmd(context.Background()))
+	ctx, err := durationHook.BeforeProcess(ctx, red.NewCmd(context.Background()))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,10 +112,10 @@ func TestHookProcessPipelineCase2(t *testing.T) {
 	})
 	defer ztrace.StopAgent()
 
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	ctx, err := durationHook.BeforeProcessPipeline(context.Background(), []red.Cmder{
+	ctx, err := durationHook.BeforeProcessPipeline(ctx, []red.Cmder{
 		red.NewCmd(context.Background()),
 	})
 	assert.NoError(t, err)
@@ -132,20 +132,20 @@ func TestHookProcessPipelineCase2(t *testing.T) {
 }
 
 func TestHookProcessPipelineCase3(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	assert.Nil(t, durationHook.AfterProcessPipeline(context.Background(), []red.Cmder{
+	assert.Nil(t, durationHook.AfterProcessPipeline(ctx, []red.Cmder{
 		red.NewCmd(context.Background()),
 	}))
 	assert.True(t, len(w.String()) == 0)
 }
 
 func TestHookProcessPipelineCase4(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	ctx := context.WithValue(context.Background(), startTimeKey, "foo")
+	ctx = context.WithValue(ctx, startTimeKey, "foo")
 	assert.Nil(t, durationHook.AfterProcessPipeline(ctx, []red.Cmder{
 		red.NewCmd(context.Background()),
 	}))
@@ -166,29 +166,26 @@ func TestHookProcessPipelineCase5(t *testing.T) {
 }
 
 func TestLogDuration(t *testing.T) {
-	w, restore := injectLog()
+	ctx, w, restore := injectLog()
 	defer restore()
 
-	logDuration(context.Background(), []red.Cmder{
+	logDuration(ctx, []red.Cmder{
 		red.NewCmd(context.Background(), "get", "foo"),
 	}, 1*time.Second)
 	assert.True(t, strings.Contains(w.String(), "get foo"))
 
-	logDuration(context.Background(), []red.Cmder{
+	logDuration(ctx, []red.Cmder{
 		red.NewCmd(context.Background(), "get", "foo"),
 		red.NewCmd(context.Background(), "set", "bar", 0),
 	}, 1*time.Second)
 	assert.True(t, strings.Contains(w.String(), `get foo\nset bar 0`))
 }
 
-func injectLog() (r *strings.Builder, restore func()) {
+func injectLog() (ctx context.Context, r *strings.Builder, restore func()) {
 	var buf strings.Builder
-	w := logx.NewWriter(&buf)
-	o := logx.Reset()
-	logx.SetWriter(w)
+	ctx = logx.WithCtx(context.Background(), logx.NewTestLogger(&buf))
 
-	return &buf, func() {
-		logx.Reset()
-		logx.SetWriter(o)
+	return ctx, &buf, func() {
+		buf.Reset()
 	}
 }

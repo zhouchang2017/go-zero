@@ -46,7 +46,7 @@ func (rw *RemoteWriter) Write(report *StatReport) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		logx.Errorf("write report failed, code: %d, reason: %s", resp.StatusCode, resp.Status)
+		logx.GlobalLogger().Errorf("write report failed, code: %d, reason: %s", resp.StatusCode, resp.Status)
 		return ErrWriteFailed
 	}
 

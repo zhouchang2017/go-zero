@@ -23,14 +23,14 @@ var configFile = flag.String("f", "etc/update-api.json", "the config file")
 func forChksumHandler(file string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !pathx.FileExists(file) {
-			logx.Errorf("file %q not exist", file)
+			logx.GlobalLogger().Errorf("file %q not exist", file)
 			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
 			return
 		}
 
 		content, err := os.ReadFile(file)
 		if err != nil {
-			logx.Error(err)
+			logx.GlobalLogger().Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
