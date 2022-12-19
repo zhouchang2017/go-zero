@@ -122,6 +122,7 @@ func genActions(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) erro
 func genActionImports(parentPkg string, api *spec.ApiSpec, actionName string) string {
 	importSet := collection.NewSet()
 	importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)))
+	importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, typesDir)))
 	for _, group := range api.Service.Groups {
 		action := group.GetAnnotation("action")
 		if action != "" && action != actionName {

@@ -110,8 +110,9 @@ func DoGenProject(apiFile, dir, style string) error {
 	if err := apiformat.ApiFormatByPath(apiFile, false); err != nil {
 		return err
 	}
-
 	fmt.Println(aurora.Green("Done."))
+	fmt.Println(aurora.Green("第一次生成的话，请稍后执行："))
+	fmt.Println(aurora.Green("go mod edit -replace github.com/zeromicro/go-zero=github.com/zhouchang2017/go-zero@master"))
 	return nil
 }
 

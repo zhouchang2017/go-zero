@@ -1,11 +1,9 @@
 package {{.PkgName}}
 import (
-	"api/internal/svc"
 	"{{.ModuleUrl}}/core/logx"
 	"{{.ModuleUrl}}/rest/httpx"
 	"net/http"
 	"sync"
-	"api/internal/types"
 	{{.ImportPackages}}
 )
 
