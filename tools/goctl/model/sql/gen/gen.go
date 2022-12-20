@@ -351,12 +351,19 @@ func (g *defaultGenerator) genModelCustom(in parser.Table, withCache bool) (stri
 		return "", err
 	}
 
+	modelFilename, err := format.FileNamingFormat(g.cfg.NamingFormat,
+		fmt.Sprintf("%s_model", in.Name.Source()))
+	if err != nil {
+		return "", err
+	}
+
 	t := util.With("model-custom").
 		Parse(text).
 		GoFmt(true)
 	output, err := t.Execute(map[string]interface{}{
 		"pkg":                   g.pkg,
 		"withCache":             withCache,
+		"modelFilename":         modelFilename,
 		"upperStartCamelObject": in.Name.ToCamel(),
 		"lowerStartCamelObject": stringx.From(in.Name.ToCamel()).Untitle(),
 	})

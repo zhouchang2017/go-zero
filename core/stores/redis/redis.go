@@ -47,6 +47,7 @@ type (
 		Addr string
 		Type string
 		Pass string
+		DB   int
 		tls  bool
 		brk  breaker.Breaker
 	}

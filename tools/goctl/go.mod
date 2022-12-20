@@ -21,4 +21,4 @@ require (
 	google.golang.org/protobuf v1.28.1
 )
 
-replace github.com/zeromicro/go-zero => github.com/zhouchang2017/go-zero v0.0.0-20221219104906-b59d501db716
+replace github.com/zeromicro/go-zero => ./../../

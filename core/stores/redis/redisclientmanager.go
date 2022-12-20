@@ -1,8 +1,11 @@
 package redis
 
 import (
+	"context"
 	"crypto/tls"
+	"fmt"
 	"io"
+	"net"
 
 	red "github.com/go-redis/redis/v8"
 	"github.com/zeromicro/go-zero/core/syncx"
@@ -15,9 +18,10 @@ const (
 )
 
 var clientManager = syncx.NewResourceManager()
+var Dialer func(ctx context.Context, network, addr string) (net.Conn, error)
 
 func getClient(r *Redis) (*red.Client, error) {
-	val, err := clientManager.GetResource(r.Addr, func() (io.Closer, error) {
+	val, err := clientManager.GetResource(fmt.Sprintf("%s_%d", r.Addr, r.DB), func() (io.Closer, error) {
 		var tlsConfig *tls.Config
 		if r.tls {
 			tlsConfig = &tls.Config{
@@ -27,10 +31,11 @@ func getClient(r *Redis) (*red.Client, error) {
 		store := red.NewClient(&red.Options{
 			Addr:         r.Addr,
 			Password:     r.Pass,
-			DB:           defaultDatabase,
+			DB:           r.DB,
 			MaxRetries:   maxRetries,
 			MinIdleConns: idleConns,
 			TLSConfig:    tlsConfig,
+			Dialer:       Dialer,
 		})
 		store.AddHook(durationHook)
 

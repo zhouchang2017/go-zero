@@ -8,6 +8,8 @@ import (
 
 import "github.com/zeromicro/go-zero/core/stores/sqlx"
 {{end}}
+//go:generate mockgen -package {{.pkg}} -destination mock_{{.modelFilename}}_gen.go . {{.upperStartCamelObject}}Model
+
 var _ {{.upperStartCamelObject}}Model = (*custom{{.upperStartCamelObject}}Model)(nil)
 
 type (

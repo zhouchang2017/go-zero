@@ -17,6 +17,8 @@ const (
 
 var connManager = syncx.NewResourceManager()
 
+var NamedResolver
+
 type pingedDB struct {
 	*sql.DB
 	once sync.Once
