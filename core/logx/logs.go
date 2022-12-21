@@ -1,6 +1,7 @@
 package logx
 
 import (
+	"go.uber.org/zap"
 	"log"
 	"os"
 	"sync"
@@ -24,6 +25,17 @@ func SetGlobalLogger(l Logger) {
 }
 
 func GlobalLogger() Logger {
+	return globalLogger
+}
+
+// CloneWithAddCallerSkip 返回一个新的Logger实例
+func CloneWithAddCallerSkip(skip int) Logger {
+	if logger, ok := globalLogger.(*ZapLogger); ok {
+		return &ZapLogger{
+			base:  logger.clone().base.WithOptions(zap.AddCallerSkip(skip)),
+			level: logger.level,
+		}
+	}
 	return globalLogger
 }
 

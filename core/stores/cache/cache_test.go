@@ -119,14 +119,14 @@ func TestCache_SetDel(t *testing.T) {
 	conf := ClusterConf{
 		{
 			RedisConf: redis.RedisConf{
-				Host: r1.Addr,
+				Addr: r1.Addr,
 				Type: redis.NodeType,
 			},
 			Weight: 100,
 		},
 		{
 			RedisConf: redis.RedisConf{
-				Host: r2.Addr,
+				Addr: r2.Addr,
 				Type: redis.NodeType,
 			},
 			Weight: 100,
@@ -164,7 +164,7 @@ func TestCache_OneNode(t *testing.T) {
 	conf := ClusterConf{
 		{
 			RedisConf: redis.RedisConf{
-				Host: r.Addr,
+				Addr: r.Addr,
 				Type: redis.NodeType,
 			},
 			Weight: 100,

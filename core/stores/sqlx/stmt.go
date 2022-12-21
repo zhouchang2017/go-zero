@@ -36,7 +36,7 @@ func SetSlowThreshold(threshold time.Duration) {
 
 func exec(ctx context.Context, conn sessionConn, q string, args ...interface{}) (sql.Result, error) {
 	guard := newGuard("exec")
-	if err := guard.start(q, args...); err != nil {
+	if err := guard.start(ctx, q, args...); err != nil {
 		return nil, err
 	}
 
@@ -48,7 +48,7 @@ func exec(ctx context.Context, conn sessionConn, q string, args ...interface{}) 
 
 func execStmt(ctx context.Context, conn stmtConn, q string, args ...interface{}) (sql.Result, error) {
 	guard := newGuard("execStmt")
-	if err := guard.start(q, args...); err != nil {
+	if err := guard.start(ctx, q, args...); err != nil {
 		return nil, err
 	}
 
@@ -61,7 +61,7 @@ func execStmt(ctx context.Context, conn stmtConn, q string, args ...interface{})
 func query(ctx context.Context, conn sessionConn, scanner func(*sql.Rows) error,
 	q string, args ...interface{}) error {
 	guard := newGuard("query")
-	if err := guard.start(q, args...); err != nil {
+	if err := guard.start(ctx, q, args...); err != nil {
 		return err
 	}
 
@@ -78,7 +78,7 @@ func query(ctx context.Context, conn sessionConn, scanner func(*sql.Rows) error,
 func queryStmt(ctx context.Context, conn stmtConn, scanner func(*sql.Rows) error,
 	q string, args ...interface{}) error {
 	guard := newGuard("queryStmt")
-	if err := guard.start(q, args...); err != nil {
+	if err := guard.start(ctx, q, args...); err != nil {
 		return err
 	}
 
@@ -94,11 +94,13 @@ func queryStmt(ctx context.Context, conn stmtConn, scanner func(*sql.Rows) error
 
 type (
 	sqlGuard interface {
-		start(q string, args ...interface{}) error
+		start(ctx context.Context, q string, args ...interface{}) error
 		finish(ctx context.Context, err error)
 	}
 
-	nilGuard struct{}
+	nilGuard struct {
+		command string
+	}
 
 	realSqlGuard struct {
 		command   string
@@ -114,17 +116,20 @@ func newGuard(command string) sqlGuard {
 		}
 	}
 
-	return nilGuard{}
+	return nilGuard{command}
 }
 
-func (n nilGuard) start(_ string, _ ...interface{}) error {
+func (n nilGuard) start(ctx context.Context, q string, args ...interface{}) error {
+	rangeSqlHookOnStart(n.command, ctx, q, args...)
 	return nil
 }
 
-func (n nilGuard) finish(_ context.Context, _ error) {
+func (n nilGuard) finish(ctx context.Context, err error) {
+	rangeSqlHookOnFinished(n.command, ctx, err)
 }
 
 func (e *realSqlGuard) finish(ctx context.Context, err error) {
+	rangeSqlHookOnFinished(e.command, ctx, err)
 	duration := timex.Since(e.startTime)
 	if duration > slowThreshold.Load() {
 		logx.FromCtx(ctx).WithDuration(duration).Slowf("[SQL] %s: slowcall - %s", e.command, e.stmt)
@@ -139,7 +144,8 @@ func (e *realSqlGuard) finish(ctx context.Context, err error) {
 	metricReqDur.Observe(int64(duration/time.Millisecond), e.command)
 }
 
-func (e *realSqlGuard) start(q string, args ...interface{}) error {
+func (e *realSqlGuard) start(ctx context.Context, q string, args ...interface{}) error {
+	rangeSqlHookOnStart(e.command, ctx, q, args...)
 	stmt, err := format(q, args...)
 	if err != nil {
 		return err

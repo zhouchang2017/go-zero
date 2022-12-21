@@ -1,12 +1,12 @@
 package trace
 
 // TraceName represents the tracing name.
-const TraceName = "go-zero"
+var TraceName = "go-zero"
 
 // A Config is an opentelemetry config.
 type Config struct {
-	Name     string  `json:",optional"`
-	Endpoint string  `json:",optional"`
-	Sampler  float64 `json:",default=1.0"`
-	Batcher  string  `json:",default=jaeger,options=jaeger|zipkin|grpc"`
+	Name     string
+	Endpoint string
+	Sampler  float64 `default:"1.0"`
+	Batcher  string  `default:"jaeger" validate:"oneof=jaeger zipkin grpc"`
 }

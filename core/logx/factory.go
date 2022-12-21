@@ -12,7 +12,7 @@ import (
 )
 
 func NewTestLogger(w io.Writer) *ZapLogger {
-	return New("plain", "", "debug", true, 0, w)
+	return New("plain", "", "debug", true, 3, w)
 }
 
 // NewDevelopment 开发Logger
@@ -33,7 +33,6 @@ func NewWithConf(conf *LogConf) (*ZapLogger, error) {
 	if conf == nil {
 		return NewDevelopment(), nil
 	}
-	conf.fillDefaultValue()
 	writer, err := conf.buildWriter()
 	if err != nil {
 		return nil, err

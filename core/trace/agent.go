@@ -29,6 +29,13 @@ var (
 	tp     *sdktrace.TracerProvider
 )
 
+//SetTraceName 设置tracer名称；默认去ServiceConf.Name
+func SetTraceName(name string) {
+	if name != "" {
+		TraceName = name
+	}
+}
+
 // StartAgent starts an opentelemetry agent.
 func StartAgent(c Config) {
 	lock.Lock()

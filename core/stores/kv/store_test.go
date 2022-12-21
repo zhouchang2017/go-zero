@@ -741,14 +741,14 @@ func runOnCluster(fn func(cluster Store)) {
 	store := NewStore([]cache.NodeConf{
 		{
 			RedisConf: redis.RedisConf{
-				Host: s1.Addr(),
+				Addr: s1.Addr(),
 				Type: redis.NodeType,
 			},
 			Weight: 100,
 		},
 		{
 			RedisConf: redis.RedisConf{
-				Host: s2.Addr(),
+				Addr: s2.Addr(),
 				Type: redis.NodeType,
 			},
 			Weight: 100,

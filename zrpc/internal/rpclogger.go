@@ -6,5 +6,5 @@ import (
 )
 
 func init() {
-	grpclog.SetLoggerV2(logx.GlobalLogger())
+	grpclog.SetLoggerV2(logx.CloneWithAddCallerSkip(0))
 }

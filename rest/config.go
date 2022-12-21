@@ -15,8 +15,8 @@ type (
 
 	// A SignatureConf is a signature config.
 	SignatureConf struct {
-		Strict      bool          `json:",default=false"`
-		Expiry      time.Duration `json:",default=1h"`
+		Strict      bool          `default:"false"`
+		Expiry      time.Duration `default:"1h"`
 		PrivateKeys []PrivateKeyConf
 	}
 
@@ -29,16 +29,16 @@ type (
 	// if with the name Conf, there will be two Conf inside Config.
 	RestConf struct {
 		service.ServiceConf
-		Host     string `json:",default=0.0.0.0"`
-		Port     int
-		CertFile string `json:",optional"`
-		KeyFile  string `json:",optional"`
-		Verbose  bool   `json:",optional"`
-		MaxConns int    `json:",default=10000"`
-		MaxBytes int64  `json:",default=1048576"`
+		Host     string `default:"0.0.0.0"`
+		Port     int    `validate:"required,gt=0,lt=65535"`
+		CertFile string
+		KeyFile  string
+		Verbose  bool
+		MaxConns int   `default:"10000"`
+		MaxBytes int64 `default:"1048576"`
 		// milliseconds
-		Timeout      int64         `json:",default=3000"`
-		CpuThreshold int64         `json:",default=900,range=[0:1000]"`
-		Signature    SignatureConf `json:",optional"`
+		Timeout      int64 `default:"3000"`
+		CpuThreshold int64 `default:"900" validate:"gte=0,lte=1000"`
+		Signature    SignatureConf
 	}
 )

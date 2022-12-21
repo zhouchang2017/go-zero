@@ -50,6 +50,8 @@ type Logger interface {
 	Sloww(string, map[string]interface{})
 	// WithDuration returns a new logger with the given duration.
 	WithDuration(d time.Duration) Logger
+	// WithField returns a new logger with the given field.
+	WithField(key string, value interface{}) Logger
 	// WithFields returns a new logger with the given fields.
 	WithFields(fields map[string]interface{}) Logger
 	// SetLevel 设置日志级别

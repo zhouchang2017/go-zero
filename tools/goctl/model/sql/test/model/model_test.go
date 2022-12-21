@@ -251,7 +251,7 @@ func mockStudent(mockFn func(mock sqlmock.Sqlmock), fn func(m StudentModel, r *r
 	m := NewStudentModel(conn, cache.CacheConf{
 		{
 			RedisConf: redis.RedisConf{
-				Host: r.Addr,
+				Addr: r.Addr,
 				Type: "node",
 			},
 			Weight: 100,

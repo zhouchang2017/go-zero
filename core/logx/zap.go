@@ -19,29 +19,41 @@ type ZapLogger struct {
 	level *zap.AtomicLevel
 }
 
+func (z *ZapLogger) clone() *ZapLogger {
+	copy := *z
+	return &copy
+}
+
 // V checks if meet required log level.
-func (l *ZapLogger) V(v int) bool {
+func (z *ZapLogger) V(v int) bool {
 	return v >= 2
 }
 
 func (z *ZapLogger) Slow(i ...interface{}) {
-	z.Error(i...)
+	z.log(zap.ErrorLevel, "", i)
 }
 
 func (z *ZapLogger) Slowf(s string, i ...interface{}) {
-	z.Errorf(s, i...)
+	z.log(zap.ErrorLevel, s, i)
 }
 
 func (z *ZapLogger) Slowv(i interface{}) {
-	z.Error(i)
+	z.log(zap.ErrorLevel, "", []interface{}{i})
 }
 
 func (z *ZapLogger) Sloww(s string, fields map[string]interface{}) {
-	z.WithFields(fields).Error(s)
+	var zFields []zap.Field
+	for k, v := range fields {
+		zFields = append(zFields, zap.Any(k, v))
+	}
+	z.log(zap.ErrorLevel, "", []interface{}{zFields})
 }
 
 func (z *ZapLogger) WithDuration(d time.Duration) Logger {
-	return z.WithField("duration", d)
+	return &ZapLogger{
+		base:  z.base.With(zap.Duration("duration", d)),
+		level: z.level,
+	}
 }
 
 func (z *ZapLogger) buildRequestId(id string) string {
@@ -244,6 +256,9 @@ func getMessage(template string, fmtArgs []interface{}) (string, []zap.Field) {
 		case zap.Field:
 			fields = append(fields, arg.(zap.Field))
 		default:
+			if template == "" {
+				template = "%v"
+			}
 			args = append(args, arg)
 		}
 	}

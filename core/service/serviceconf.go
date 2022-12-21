@@ -29,12 +29,12 @@ const (
 type ServiceConf struct {
 	Name       string
 	Logs       logx.LogConfigMap
-	Mode       string `json:",default=pro,options=dev|test|rt|pre|pro"`
-	MetricsUrl string `json:",optional"`
+	Mode       string `default:"pro"`
+	MetricsUrl string
 	// Deprecated: please use DevServer
-	Prometheus prometheus.Config `json:",optional"`
-	Telemetry  trace.Config      `json:",optional"`
-	DevServer  devserver.Config  `json:",optional"`
+	Prometheus prometheus.Config
+	Telemetry  trace.Config
+	DevServer  devserver.Config
 }
 
 // MustSetUp sets up the service, exits on error.
@@ -56,6 +56,7 @@ func (sc ServiceConf) SetUp() error {
 	if len(sc.Telemetry.Name) == 0 {
 		sc.Telemetry.Name = sc.Name
 	}
+	trace.SetTraceName(sc.Name)
 	trace.StartAgent(sc.Telemetry)
 	proc.AddShutdownListener(func() {
 		trace.StopAgent()

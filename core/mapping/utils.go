@@ -248,7 +248,6 @@ func parseKeyAndOptions(tagName string, field reflect.StructField) (string, *fie
 		err:     err,
 	}
 	cacheLock.Unlock()
-
 	return stringx.TakeOne(key, field.Name), options, err
 }
 
@@ -359,7 +358,6 @@ func parseOption(fieldOpts *fieldOptions, fieldName, option string) error {
 		if err != nil {
 			return err
 		}
-
 		fieldOpts.Default = val
 	case strings.HasPrefix(option, envOption):
 		val, err := parseProperty(fieldName, envOption, option)

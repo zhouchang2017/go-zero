@@ -2,11 +2,11 @@ package mongo
 
 import (
 	"encoding/json"
+	"github.com/zeromicro/go-zero/core/logx"
 	"time"
 
 	"github.com/globalsign/mgo"
 	"github.com/zeromicro/go-zero/core/breaker"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/mongo/internal"
 	"github.com/zeromicro/go-zero/core/timex"
 )
@@ -35,7 +35,6 @@ type (
 		name       string
 		collection internal.MgoCollection
 		brk        breaker.Breaker
-		logger     logx.Logger
 	}
 
 	keepablePromise struct {
@@ -49,7 +48,6 @@ func newCollection(collection *mgo.Collection, brk breaker.Breaker) Collection {
 		name:       collection.FullName,
 		collection: collection,
 		brk:        brk,
-		logger:     logx.GlobalLogger(),
 	}
 }
 
@@ -203,21 +201,21 @@ func (c *decoratedCollection) Upsert(selector, update interface{}) (info *mgo.Ch
 func (c *decoratedCollection) logDuration(method string, duration time.Duration, err error, docs ...interface{}) {
 	content, e := json.Marshal(docs)
 	if e != nil {
-		c.logger.Error(err)
+		logx.GlobalLogger().Error(err)
 	} else if err != nil {
 		if duration > slowThreshold.Load() {
-			c.logger.WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - fail(%s) - %s",
+			logx.GlobalLogger().WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - fail(%s) - %s",
 				c.name, method, err.Error(), string(content))
 		} else {
-			c.logger.WithDuration(duration).Infof("mongo(%s) - %s - fail(%s) - %s",
+			logx.GlobalLogger().WithDuration(duration).Infof("mongo(%s) - %s - fail(%s) - %s",
 				c.name, method, err.Error(), string(content))
 		}
 	} else {
 		if duration > slowThreshold.Load() {
-			c.logger.WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - ok - %s",
+			logx.GlobalLogger().WithDuration(duration).Slowf("[MONGO] mongo(%s) - slowcall - %s - ok - %s",
 				c.name, method, string(content))
 		} else {
-			c.logger.WithDuration(duration).Infof("mongo(%s) - %s - ok - %s", c.name, method, string(content))
+			logx.GlobalLogger().WithDuration(duration).Infof("mongo(%s) - %s - ok - %s", c.name, method, string(content))
 		}
 	}
 }

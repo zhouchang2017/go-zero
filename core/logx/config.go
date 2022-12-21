@@ -15,31 +15,24 @@ type LogConf struct {
 	// 是否控制台同时输出
 	Stdout bool
 	// 格式化输出，json|plain
-	Formatter      string
-	TimeFormatter  string `mapstructure:"time_formatter"`
-	Level          string
-	EnableFileLine bool `mapstructure:"enable_file_line"`
+	Formatter string `default:"plain"`
+	// 时间格式化
+	// example for Time.Format demonstrates
+	// Formatter=json  TimeFormatter=2006-01-02T15:04:05Z07:00
+	// Formatter=plain TimeFormatter=2006-01-02 15:04:05.000000
+	TimeFormatter string
+	// 日志级别，debug|info|warn|error|panic|fatal
+	Level string `default:"debug"`
+	// 是否显示行号
+	EnableFileLine bool
 	Path           string
 	//MaxAge 日志保存时间 默认15天 单位天
-	MaxAge int
-
+	MaxAge int `default:"15"`
 	//单位为m 默认200m 分割
-	MaxFileSize int
+	MaxFileSize int `default:"200"`
 	//文件保存的个数 默认200
-	MaxBackup int
-	Default   bool
-}
-
-func (c *LogConf) fillDefaultValue() {
-	if c.MaxAge <= 0 {
-		c.MaxAge = 15
-	}
-	if c.MaxBackup <= 0 {
-		c.MaxBackup = 200
-	}
-	if c.MaxFileSize <= 0 {
-		c.MaxFileSize = 200
-	}
+	MaxBackup int  `default:"200"`
+	Default   bool `default:"false"`
 }
 
 func (c *LogConf) buildWriter() (writers []io.Writer, err error) {

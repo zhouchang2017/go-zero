@@ -12,26 +12,26 @@ type (
 	RpcServerConf struct {
 		service.ServiceConf
 		ListenOn      string
-		Etcd          discov.EtcdConf    `json:",optional,inherit"`
-		Auth          bool               `json:",optional"`
-		Redis         redis.RedisKeyConf `json:",optional"`
-		StrictControl bool               `json:",optional"`
+		Etcd          discov.EtcdConf
+		Auth          bool
+		Redis         redis.RedisKeyConf
+		StrictControl bool
 		// setting 0 means no timeout
-		Timeout      int64 `json:",default=2000"`
-		CpuThreshold int64 `json:",default=900,range=[0:1000]"`
+		Timeout      int64 `default:"2000"`
+		CpuThreshold int64 `default:"900" validate:"required,gte=0,lte=1000"`
 		// grpc health check switch
-		Health bool `json:",default=true"`
+		Health bool `default:"true"`
 	}
 
 	// A RpcClientConf is a rpc client config.
 	RpcClientConf struct {
-		Etcd      discov.EtcdConf `json:",optional,inherit"`
-		Endpoints []string        `json:",optional"`
-		Target    string          `json:",optional"`
-		App       string          `json:",optional"`
-		Token     string          `json:",optional"`
-		NonBlock  bool            `json:",optional"`
-		Timeout   int64           `json:",default=2000"`
+		Etcd      discov.EtcdConf
+		Endpoints []string
+		Target    string
+		App       string
+		Token     string
+		NonBlock  bool
+		Timeout   int64 `default:"2000"`
 	}
 )
 

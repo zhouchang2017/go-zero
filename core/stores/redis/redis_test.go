@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
+	"fmt"
 	"io"
 	"strconv"
 	"testing"
@@ -1179,7 +1180,7 @@ func runOnRedis(t *testing.T, fn func(client *Redis)) {
 	s, err := miniredis.Run()
 	assert.Nil(t, err)
 	defer func() {
-		client, err := clientManager.GetResource(s.Addr(), func() (io.Closer, error) {
+		client, err := clientManager.GetResource(fmt.Sprintf("%s_0", s.Addr()), func() (io.Closer, error) {
 			return nil, errors.New("should already exist")
 		})
 		if err != nil {
@@ -1202,7 +1203,7 @@ func runOnRedisTLS(t *testing.T, fn func(client *Redis)) {
 	})
 	assert.Nil(t, err)
 	defer func() {
-		client, err := clientManager.GetResource(s.Addr(), func() (io.Closer, error) {
+		client, err := clientManager.GetResource(fmt.Sprintf("%s_0", s.Addr()), func() (io.Closer, error) {
 			return nil, errors.New("should already exist")
 		})
 		if err != nil {

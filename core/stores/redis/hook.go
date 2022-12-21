@@ -151,7 +151,15 @@ func logDuration(ctx context.Context, cmds []red.Cmder, duration time.Duration) 
 		}
 		buf.WriteString(build.String())
 	}
-	logx.FromCtx(ctx).WithDuration(duration).Slowf("[REDIS] slowcall on executing: %s", buf.String())
+	logger := logx.FromCtx(ctx)
+	traceID := trace.TraceIDFromContext(ctx)
+	if len(traceID) > 0 {
+		logger.WithFields(map[string]interface{}{
+			"traceId": traceID,
+		}).WithDuration(duration).Slowf("[REDIS] slowcall on executing: %s", buf.String())
+	} else {
+		logger.WithDuration(duration).Slowf("[REDIS] slowcall on executing: %s", buf.String())
+	}
 }
 
 func (h hook) startSpan(ctx context.Context, cmds ...red.Cmder) context.Context {
@@ -159,13 +167,11 @@ func (h hook) startSpan(ctx context.Context, cmds ...red.Cmder) context.Context 
 		spanName,
 		oteltrace.WithSpanKind(oteltrace.SpanKindClient),
 	)
-
 	cmdStrs := make([]string, 0, len(cmds))
 	for _, cmd := range cmds {
 		cmdStrs = append(cmdStrs, cmd.Name())
 	}
 	span.SetAttributes(redisCmdsAttributeKey.StringSlice(cmdStrs))
-
 	return ctx
 }
 

@@ -16,7 +16,7 @@ func TestRedisConf(t *testing.T) {
 		{
 			name: "missing host",
 			RedisConf: RedisConf{
-				Host: "",
+				Addr: "",
 				Type: NodeType,
 				Pass: "",
 			},
@@ -25,7 +25,7 @@ func TestRedisConf(t *testing.T) {
 		{
 			name: "missing type",
 			RedisConf: RedisConf{
-				Host: "localhost:6379",
+				Addr: "localhost:6379",
 				Type: "",
 				Pass: "",
 			},
@@ -34,7 +34,7 @@ func TestRedisConf(t *testing.T) {
 		{
 			name: "ok",
 			RedisConf: RedisConf{
-				Host: "localhost:6379",
+				Addr: "localhost:6379",
 				Type: NodeType,
 				Pass: "",
 			},
@@ -64,7 +64,7 @@ func TestRedisKeyConf(t *testing.T) {
 			name: "missing host",
 			RedisKeyConf: RedisKeyConf{
 				RedisConf: RedisConf{
-					Host: "",
+					Addr: "",
 					Type: NodeType,
 					Pass: "",
 				},
@@ -76,7 +76,7 @@ func TestRedisKeyConf(t *testing.T) {
 			name: "missing key",
 			RedisKeyConf: RedisKeyConf{
 				RedisConf: RedisConf{
-					Host: "localhost:6379",
+					Addr: "localhost:6379",
 					Type: NodeType,
 					Pass: "",
 				},
@@ -88,7 +88,7 @@ func TestRedisKeyConf(t *testing.T) {
 			name: "ok",
 			RedisKeyConf: RedisKeyConf{
 				RedisConf: RedisConf{
-					Host: "localhost:6379",
+					Addr: "localhost:6379",
 					Type: NodeType,
 					Pass: "",
 				},

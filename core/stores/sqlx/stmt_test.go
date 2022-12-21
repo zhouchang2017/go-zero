@@ -214,9 +214,9 @@ func TestNilGuard(t *testing.T) {
 
 	DisableLog()
 	guard := newGuard("any")
-	assert.Nil(t, guard.start("foo", "bar"))
+	assert.Nil(t, guard.start(context.Background(), "foo", "bar"))
 	guard.finish(context.Background(), nil)
-	assert.Equal(t, nilGuard{}, guard)
+	assert.Equal(t, nilGuard{"any"}, guard)
 }
 
 type mockedSessionConn struct {

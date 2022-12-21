@@ -37,6 +37,6 @@ func TestRpcServerConf(t *testing.T) {
 	}
 	assert.True(t, conf.HasEtcd())
 	assert.NotNil(t, conf.Validate())
-	conf.Redis.Host = "localhost:5678"
+	conf.Redis.Addr = "localhost:5678"
 	assert.Nil(t, conf.Validate())
 }

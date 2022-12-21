@@ -558,7 +558,7 @@ func createModel(t *testing.T, mt *mtest.T) *Model {
 		return MustNewModel(mt.Name(), mt.DB.Name(), mt.Coll.Name(), cache.CacheConf{
 			cache.NodeConf{
 				RedisConf: redis.RedisConf{
-					Host: s.Addr(),
+					Addr: s.Addr(),
 					Type: redis.NodeType,
 				},
 				Weight: 100,

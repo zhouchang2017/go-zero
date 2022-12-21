@@ -47,7 +47,7 @@ func TestLoggerFatalf(t *testing.T) {
 	ctx, w, restore := injectLog()
 	defer restore()
 
-	logx.FromCtx(ctx).Fatalf(content)
+	logx.FromCtx(ctx).Errorf(content)
 	assert.Contains(t, w.String(), content)
 }
 
@@ -55,55 +55,53 @@ func TestLoggerFatalln(t *testing.T) {
 	ctx, w, restore := injectLog()
 	defer restore()
 
-	logx.FromCtx(ctx).Fatalln(content)
+	logx.FromCtx(ctx).Errorln(content)
 	assert.Contains(t, w.String(), content)
 }
 
 func TestLoggerInfo(t *testing.T) {
-	ctx, w, restore := injectLog()
+	_, w, restore := injectLog()
 	defer restore()
 
-	logx.FromCtx(ctx).Info(content)
+	logx.CloneWithAddCallerSkip(0).Info(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerInfof(t *testing.T) {
-	ctx, w, restore := injectLog()
+	_, w, restore := injectLog()
 	defer restore()
 
-	logx.FromCtx(ctx).Infof(content)
+	logx.CloneWithAddCallerSkip(0).Infof(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerWarning(t *testing.T) {
-	ctx, w, restore := injectLog()
+	_, w, restore := injectLog()
 	defer restore()
-
-	logx.FromCtx(ctx).Warning(content)
+	logx.CloneWithAddCallerSkip(0).Warning(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerInfoln(t *testing.T) {
-	ctx, w, restore := injectLog()
+	_, w, restore := injectLog()
 	defer restore()
-
-	logx.FromCtx(ctx).Infoln(content)
+	logx.CloneWithAddCallerSkip(0).Infoln(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerWarningf(t *testing.T) {
-	ctx, w, restore := injectLog()
+	_, w, restore := injectLog()
 	defer restore()
 
-	logx.FromCtx(ctx).Warningf(content)
+	logx.CloneWithAddCallerSkip(0).Warningf(content)
 	assert.Empty(t, w.String())
 }
 
 func TestLoggerWarningln(t *testing.T) {
-	ctx, w, restore := injectLog()
+	_, w, restore := injectLog()
 	defer restore()
 
-	logx.FromCtx(ctx).Warningln(content)
+	logx.CloneWithAddCallerSkip(0).Warningln(content)
 	assert.Empty(t, w.String())
 }
 

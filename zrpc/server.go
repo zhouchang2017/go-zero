@@ -88,14 +88,13 @@ func (rs *RpcServer) AddUnaryInterceptors(interceptors ...grpc.UnaryServerInterc
 // Use proc.SetTimeToForceQuit to customize the graceful shutdown period.
 func (rs *RpcServer) Start() {
 	if err := rs.server.Start(rs.register); err != nil {
-		logx.Error(err)
+		logx.GlobalLogger().Error(err)
 		panic(err)
 	}
 }
 
 // Stop stops the RpcServer.
 func (rs *RpcServer) Stop() {
-	logx.Close()
 }
 
 // DontLogContentForMethod disable logging content for given method.

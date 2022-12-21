@@ -79,7 +79,7 @@ func TestCachedConn_QueryRowIndex_NoCache(t *testing.T) {
 	c := NewConn(dummySqlConn{}, cache.CacheConf{
 		{
 			RedisConf: redis.RedisConf{
-				Host: r.Addr,
+				Addr: r.Addr,
 				Type: redis.NodeType,
 			},
 			Weight: 100,

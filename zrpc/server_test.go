@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/discov"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/core/stat"
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -21,7 +20,7 @@ func TestServer_setupInterceptors(t *testing.T) {
 		Auth: true,
 		Redis: redis.RedisKeyConf{
 			RedisConf: redis.RedisConf{
-				Host: "any",
+				Addr: "any",
 				Type: redis.NodeType,
 			},
 			Key: "foo",
@@ -38,12 +37,7 @@ func TestServer(t *testing.T) {
 	DontLogContentForMethod("foo")
 	SetServerSlowThreshold(time.Second)
 	svr := MustNewServer(RpcServerConf{
-		ServiceConf: service.ServiceConf{
-			Log: logx.LogConf{
-				ServiceName: "foo",
-				Mode:        "console",
-			},
-		},
+		ServiceConf:   service.ServiceConf{},
 		ListenOn:      "localhost:8080",
 		Etcd:          discov.EtcdConf{},
 		Auth:          false,
@@ -62,13 +56,8 @@ func TestServer(t *testing.T) {
 
 func TestServerError(t *testing.T) {
 	_, err := NewServer(RpcServerConf{
-		ServiceConf: service.ServiceConf{
-			Log: logx.LogConf{
-				ServiceName: "foo",
-				Mode:        "console",
-			},
-		},
-		ListenOn: "localhost:8080",
+		ServiceConf: service.ServiceConf{},
+		ListenOn:    "localhost:8080",
 		Etcd: discov.EtcdConf{
 			Hosts: []string{"localhost"},
 		},
@@ -81,13 +70,8 @@ func TestServerError(t *testing.T) {
 
 func TestServer_HasEtcd(t *testing.T) {
 	svr := MustNewServer(RpcServerConf{
-		ServiceConf: service.ServiceConf{
-			Log: logx.LogConf{
-				ServiceName: "foo",
-				Mode:        "console",
-			},
-		},
-		ListenOn: "localhost:8080",
+		ServiceConf: service.ServiceConf{},
+		ListenOn:    "localhost:8080",
 		Etcd: discov.EtcdConf{
 			Hosts: []string{"notexist"},
 			Key:   "any",
@@ -104,12 +88,7 @@ func TestServer_HasEtcd(t *testing.T) {
 
 func TestServer_StartFailed(t *testing.T) {
 	svr := MustNewServer(RpcServerConf{
-		ServiceConf: service.ServiceConf{
-			Log: logx.LogConf{
-				ServiceName: "foo",
-				Mode:        "console",
-			},
-		},
+		ServiceConf: service.ServiceConf{},
 		ListenOn: "localhost:aaa",
 	}, func(server *grpc.Server) {
 	})

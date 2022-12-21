@@ -1,43 +1,21 @@
 package logx
 
 import (
-	"errors"
+	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
 func TestZapLogger_WithRequestId(t *testing.T) {
-	conf := make(LogConfigMap)
-	conf["access"] = LogConf{
-		Stdout:    false,
-		Formatter: "json",
-		Level:     "info",
-		Path:      "/tmp/access.log",
-	}
+	var buf strings.Builder
+	logger := NewTestLogger(&buf)
+	SetGlobalLogger(logger)
+	defer buf.Reset()
 
-	conf["app"] = LogConf{
-		Stdout:         true,
-		Formatter:      "plain",
-		EnableFileLine: true,
-		Path:           "/tmp/app.log",
-		Default:        true,
-	}
-	MustSetup(conf)
-	log2, err := Get("access")
-	if err != nil {
-		panic(err)
-	}
-	log2.Info("hello")
-	appLogger, err := Get("app")
-	if err != nil {
-		panic(err)
-	}
-	appLogger.Info("no requestId")
-	l := appLogger.WithRequestId("xxxxx1111.2222")
+	logger.Infof("hello")
+	assert.NotContains(t, buf.String(), "xxxxx1111.2222")
+
+	l := logger.WithRequestId("xxxxx1111.2222")
 	l.Infof("hello")
-	l.WithRequestId("xxx2222.2222").Info("bye")
-
-	development := newJsonDevelopment()
-	development.WithRequestId("requestxxxxx01").Info("ok")
-
-	Must(errors.New("err"))
+	assert.Contains(t, buf.String(), "xxxxx1111.2222")
 }

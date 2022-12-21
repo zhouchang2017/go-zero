@@ -1,6 +1,10 @@
 package httpx
 
 import (
+	"encoding/json"
+	"github.com/creasty/defaults"
+	"github.com/go-playground/validator/v10"
+	"github.com/zeromicro/go-zero/core/syncx"
 	"io"
 	"net/http"
 	"strings"
@@ -21,9 +25,16 @@ const (
 )
 
 var (
-	formUnmarshaler = mapping.NewUnmarshaler(formKey, mapping.WithStringValues())
-	pathUnmarshaler = mapping.NewUnmarshaler(pathKey, mapping.WithStringValues())
+	formUnmarshaler      = mapping.NewUnmarshaler(formKey, mapping.WithStringValues())
+	pathUnmarshaler      = mapping.NewUnmarshaler(pathKey, mapping.WithStringValues())
+	validatePostJsonBody = syncx.ForAtomicBool(true)
+	validate             = validator.New()
 )
+
+// SetValidatePostJsonBody 设置是否验证post请求body
+func SetValidatePostJsonBody(ok bool) {
+	validatePostJsonBody.Set(ok)
+}
 
 // Parse parses the request.
 func Parse(r *http.Request, v interface{}) error {
@@ -83,7 +94,16 @@ func ParseHeader(headerValue string) map[string]string {
 func ParseJsonBody(r *http.Request, v interface{}) error {
 	if withJsonBody(r) {
 		reader := io.LimitReader(r.Body, maxBodyLen)
-		return mapping.UnmarshalJsonReader(reader, v)
+
+		if err := json.NewDecoder(reader).Decode(v); err != nil {
+			return err
+		}
+
+		if validatePostJsonBody.True() {
+			_ = defaults.Set(v)
+			return validate.Struct(v)
+		}
+		return nil
 	}
 
 	return mapping.UnmarshalJsonMap(nil, v)

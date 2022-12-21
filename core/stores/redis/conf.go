@@ -14,17 +14,17 @@ var (
 type (
 	// A RedisConf is a redis config.
 	RedisConf struct {
-		Host string
-		Type string `json:",default=node,options=node|cluster"`
-		Pass string `json:",optional"`
+		Addr string
+		Type string `default:"node" validate:"oneof=node cluster"`
+		Pass string
 		DB   int
-		Tls  bool `json:",optional"`
+		Tls  bool
 	}
 
 	// A RedisKeyConf is a redis config with key.
 	RedisKeyConf struct {
 		RedisConf
-		Key string `json:",optional"`
+		Key string
 	}
 )
 
@@ -41,12 +41,12 @@ func (rc RedisConf) NewRedis() *Redis {
 		opts = append(opts, WithTLS())
 	}
 
-	return New(rc.Host, opts...)
+	return New(rc.Addr, opts...)
 }
 
 // Validate validates the RedisConf.
 func (rc RedisConf) Validate() error {
-	if len(rc.Host) == 0 {
+	if len(rc.Addr) == 0 {
 		return ErrEmptyHost
 	}
 

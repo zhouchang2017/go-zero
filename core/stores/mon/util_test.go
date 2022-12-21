@@ -40,15 +40,16 @@ func TestFormatAddrs(t *testing.T) {
 
 func Test_logDuration(t *testing.T) {
 	var buf strings.Builder
-	logger = logx.NewTestLogger(&buf)
-
+	logger := logx.NewTestLogger(&buf)
+	logx.SetGlobalLogger(logger)
+	ctx := logx.WithCtx(context.Background(), logger)
 	buf.Reset()
-	logDuration(context.Background(), "foo", "bar", time.Millisecond, nil)
+	logDuration(ctx, "foo", "bar", time.Millisecond, nil)
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "bar")
 
 	buf.Reset()
-	logDuration(context.Background(), "foo", "bar", time.Millisecond, errors.New("bar"))
+	logDuration(ctx, "foo", "bar", time.Millisecond, errors.New("bar"))
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "bar")
 	assert.Contains(t, buf.String(), "fail")

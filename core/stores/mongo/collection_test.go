@@ -269,11 +269,12 @@ func Test_logDuration(t *testing.T) {
 	defer ctrl.Finish()
 	var buf strings.Builder
 	logger := logx.NewTestLogger(&buf)
+	logx.SetGlobalLogger(logger)
+
 	col := internal.NewMockMgoCollection(ctrl)
 	c := decoratedCollection{
 		collection: col,
 		brk:        breaker.NewBreaker(),
-		logger:     logger,
 	}
 
 	buf.Reset()

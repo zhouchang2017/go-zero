@@ -92,6 +92,25 @@ type (
 	}
 )
 
+// NewSqlConnFromConf returns a SqlConn with given sqlConf.
+func NewSqlConnFromConf(conf SqlConf, opts ...SqlOption) SqlConn {
+	conn := &commonSqlConn{
+		connProv: func() (*sql.DB, error) {
+			return getSqlConnFromConf(conf)
+		},
+		onError: func(err error) {
+			logInstanceError(conf.sourceName(), err)
+		},
+		beginTx: begin,
+		brk:     breaker.NewBreaker(),
+	}
+	for _, opt := range opts {
+		opt(conn)
+	}
+
+	return conn
+}
+
 // NewSqlConn returns a SqlConn with given driver name and datasource.
 func NewSqlConn(driverName, datasource string, opts ...SqlOption) SqlConn {
 	conn := &commonSqlConn{
