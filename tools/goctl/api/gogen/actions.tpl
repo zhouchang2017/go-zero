@@ -35,7 +35,7 @@ func {{.RegisterActionName}}(actionName string, handler func(svcCtx *svc.Service
 func {{.ActionHandlerName}}(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		action, ok := svc.CtxGetAction(ctx)
+		action, ok := internal.CtxGetAction(ctx)
 		if !ok {
 			httpx.ErrorCtx(ctx, w, types.ErrActionParamsIsNil)
 		} else {

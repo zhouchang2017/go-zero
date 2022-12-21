@@ -123,6 +123,7 @@ func genActionImports(parentPkg string, api *spec.ApiSpec, actionName string) st
 	importSet := collection.NewSet()
 	importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)))
 	importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, typesDir)))
+	importSet.AddStr(fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, internalDir)))
 	for _, group := range api.Service.Groups {
 		action := group.GetAnnotation("action")
 		if action != "" && action != actionName {

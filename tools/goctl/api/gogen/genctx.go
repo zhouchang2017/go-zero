@@ -20,7 +20,7 @@ func genCtx(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec) error {
 
 	return genFile(fileGenConfig{
 		dir:             dir,
-		subdir:          contextDir,
+		subdir:          internal,
 		filename:        filename + ".go",
 		templateName:    "ctxTemplate",
 		category:        category,
