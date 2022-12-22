@@ -5,12 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/logx"
 )
-
-func init() {
-	logx.Disable()
-}
 
 func TestRescue(t *testing.T) {
 	var count int32

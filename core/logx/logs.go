@@ -2,7 +2,6 @@ package logx
 
 import (
 	"go.uber.org/zap"
-	"log"
 	"os"
 	"sync"
 )
@@ -10,7 +9,6 @@ import (
 var (
 	globalLogger Logger = NewDevelopment()
 	lock         sync.Mutex
-	setupOnce    sync.Once
 
 	_mustLogger = newMustLogger()
 )
@@ -37,21 +35,6 @@ func CloneWithAddCallerSkip(skip int) Logger {
 		}
 	}
 	return globalLogger
-}
-
-// MustSetup sets up logging with given config c. It exits on error.
-func MustSetup(c LogConfigMap) {
-	setupOnce.Do(func() {
-		err := c.Init()
-		if err == nil {
-			return
-		}
-
-		msg := err.Error()
-		log.Print(msg)
-		globalLogger.Error(msg)
-		os.Exit(1)
-	})
 }
 
 func Disable() {

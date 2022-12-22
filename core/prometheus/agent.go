@@ -2,11 +2,11 @@ package prometheus
 
 import (
 	"fmt"
+	"github.com/zeromicro/go-zero/core/logx"
 	"net/http"
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/syncx"
 	"github.com/zeromicro/go-zero/core/threading"
 )

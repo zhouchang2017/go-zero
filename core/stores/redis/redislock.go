@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"github.com/zeromicro/go-zero/core/logx"
 	"math/rand"
 	"strconv"
 	"sync/atomic"
@@ -9,7 +10,6 @@ import (
 
 	red "github.com/go-redis/redis/v8"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stringx"
 )
 

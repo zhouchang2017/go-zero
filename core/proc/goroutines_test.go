@@ -9,8 +9,8 @@ import (
 
 func TestDumpGoroutines(t *testing.T) {
 	var buf strings.Builder
-	logger = logx.NewTestLogger(&buf)
-	
+	logx.SetGlobalLogger(logx.NewTestLogger(&buf))
+
 	dumpGoroutines()
 	assert.True(t, strings.Contains(buf.String(), ".dump"))
 }

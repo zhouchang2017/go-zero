@@ -6,7 +6,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
-	"github.com/zeromicro/go-zero/core/logx"
 	"log"
 	"os"
 	"path"
@@ -45,7 +44,7 @@ func Load(file string, v interface{}, opts ...Option) (err error) {
 	}
 	viper.WatchConfig()
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		logx.GlobalLogger().Infof("%s config change...", file)
+		log.Printf("%s config change...\n", file)
 		_ = unmarshal(v)
 	})
 	return nil

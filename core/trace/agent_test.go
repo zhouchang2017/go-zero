@@ -4,12 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 func TestStartAgent(t *testing.T) {
-	logx.Disable()
-
 	const (
 		endpoint1 = "localhost:1234"
 		endpoint2 = "remotehost:1234"

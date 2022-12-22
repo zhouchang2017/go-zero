@@ -1,10 +1,9 @@
 package cache
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"sync/atomic"
 	"time"
-
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const statInterval = time.Minute

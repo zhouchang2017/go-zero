@@ -4,6 +4,7 @@
 package proc
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +19,7 @@ func init() {
 		var profiler Stopper
 
 		// https://golang.org/pkg/os/signal/#Notify
-		signals := make(chan os.Signal, 1)
+		signals := make(chan os.Signal)
 		signal.Notify(signals, syscall.SIGUSR1, syscall.SIGUSR2, syscall.SIGTERM)
 
 		for {
@@ -43,7 +44,7 @@ func init() {
 
 				gracefulStop(signals)
 			default:
-				logger.Error("Got unregistered signal:", v)
+				logx.GlobalLogger().Error("Got unregistered signal:", v)
 			}
 		}
 	}()

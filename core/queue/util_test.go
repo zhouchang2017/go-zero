@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/mathx"
 )
 
@@ -14,10 +13,6 @@ var (
 	proba     = mathx.NewProba()
 	failProba = 0.01
 )
-
-func init() {
-	logx.Disable()
-}
 
 func TestGenerateName(t *testing.T) {
 	pushers := []Pusher{

@@ -7,14 +7,9 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const mockedDatasource = "sqlmock"
-
-func init() {
-	logx.Disable()
-}
 
 func TestSqlConn(t *testing.T) {
 	mock, err := buildConn()

@@ -6,7 +6,6 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"errors"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 

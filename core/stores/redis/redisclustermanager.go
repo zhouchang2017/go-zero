@@ -11,7 +11,7 @@ import (
 var clusterManager = syncx.NewResourceManager()
 
 func getCluster(r *Redis) (*red.ClusterClient, error) {
-	val, err := clusterManager.GetResource(r.Addr, func() (io.Closer, error) {
+	val, err := clusterManager.GetResource(redisResourceName(r), func() (io.Closer, error) {
 		var tlsConfig *tls.Config
 		if r.tls {
 			tlsConfig = &tls.Config{
@@ -27,7 +27,9 @@ func getCluster(r *Redis) (*red.ClusterClient, error) {
 			TLSConfig:    tlsConfig,
 		})
 		store.AddHook(durationHook)
-
+		for _, h := range customHooks {
+			store.AddHook(h)
+		}
 		return store, nil
 	})
 	if err != nil {

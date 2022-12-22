@@ -11,10 +11,6 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/redis/redistest"
 )
 
-func init() {
-	// logx.Disable()
-}
-
 func TestTokenLimit_WithCtx(t *testing.T) {
 	s, err := miniredis.Run()
 	assert.Nil(t, err)

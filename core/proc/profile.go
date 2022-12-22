@@ -5,6 +5,7 @@ package proc
 
 import (
 	"fmt"
+	"github.com/zeromicro/go-zero/core/logx"
 	"os"
 	"os/signal"
 	"path"
@@ -42,17 +43,17 @@ func (p *Profile) startBlockProfile() {
 	fn := createDumpFile("block")
 	f, err := os.Create(fn)
 	if err != nil {
-		logger.Errorf("profile: could not create block profile %q: %v", fn, err)
+		logx.GlobalLogger().Errorf("profile: could not create block profile %q: %v", fn, err)
 		return
 	}
 
 	runtime.SetBlockProfileRate(1)
-	logger.Infof("profile: block profiling enabled, %s", fn)
+	logx.GlobalLogger().Infof("profile: block profiling enabled, %s", fn)
 	p.closers = append(p.closers, func() {
 		pprof.Lookup("block").WriteTo(f, 0)
 		f.Close()
 		runtime.SetBlockProfileRate(0)
-		logger.Infof("profile: block profiling disabled, %s", fn)
+		logx.GlobalLogger().Infof("profile: block profiling disabled, %s", fn)
 	})
 }
 
@@ -60,16 +61,16 @@ func (p *Profile) startCpuProfile() {
 	fn := createDumpFile("cpu")
 	f, err := os.Create(fn)
 	if err != nil {
-		logger.Errorf("profile: could not create cpu profile %q: %v", fn, err)
+		logx.GlobalLogger().Errorf("profile: could not create cpu profile %q: %v", fn, err)
 		return
 	}
 
-	logger.Infof("profile: cpu profiling enabled, %s", fn)
+	logx.GlobalLogger().Infof("profile: cpu profiling enabled, %s", fn)
 	pprof.StartCPUProfile(f)
 	p.closers = append(p.closers, func() {
 		pprof.StopCPUProfile()
 		f.Close()
-		logger.Infof("profile: cpu profiling disabled, %s", fn)
+		logx.GlobalLogger().Infof("profile: cpu profiling disabled, %s", fn)
 	})
 }
 
@@ -77,18 +78,18 @@ func (p *Profile) startMemProfile() {
 	fn := createDumpFile("mem")
 	f, err := os.Create(fn)
 	if err != nil {
-		logger.Errorf("profile: could not create memory profile %q: %v", fn, err)
+		logx.GlobalLogger().Errorf("profile: could not create memory profile %q: %v", fn, err)
 		return
 	}
 
 	old := runtime.MemProfileRate
 	runtime.MemProfileRate = DefaultMemProfileRate
-	logger.Infof("profile: memory profiling enabled (rate %d), %s", runtime.MemProfileRate, fn)
+	logx.GlobalLogger().Infof("profile: memory profiling enabled (rate %d), %s", runtime.MemProfileRate, fn)
 	p.closers = append(p.closers, func() {
 		pprof.Lookup("heap").WriteTo(f, 0)
 		f.Close()
 		runtime.MemProfileRate = old
-		logger.Infof("profile: memory profiling disabled, %s", fn)
+		logx.GlobalLogger().Infof("profile: memory profiling disabled, %s", fn)
 	})
 }
 
@@ -96,19 +97,19 @@ func (p *Profile) startMutexProfile() {
 	fn := createDumpFile("mutex")
 	f, err := os.Create(fn)
 	if err != nil {
-		logger.Errorf("profile: could not create mutex profile %q: %v", fn, err)
+		logx.GlobalLogger().Errorf("profile: could not create mutex profile %q: %v", fn, err)
 		return
 	}
 
 	runtime.SetMutexProfileFraction(1)
-	logger.Infof("profile: mutex profiling enabled, %s", fn)
+	logx.GlobalLogger().Infof("profile: mutex profiling enabled, %s", fn)
 	p.closers = append(p.closers, func() {
 		if mp := pprof.Lookup("mutex"); mp != nil {
 			mp.WriteTo(f, 0)
 		}
 		f.Close()
 		runtime.SetMutexProfileFraction(0)
-		logger.Infof("profile: mutex profiling disabled, %s", fn)
+		logx.GlobalLogger().Infof("profile: mutex profiling disabled, %s", fn)
 	})
 }
 
@@ -116,17 +117,17 @@ func (p *Profile) startThreadCreateProfile() {
 	fn := createDumpFile("threadcreate")
 	f, err := os.Create(fn)
 	if err != nil {
-		logger.Errorf("profile: could not create threadcreate profile %q: %v", fn, err)
+		logx.GlobalLogger().Errorf("profile: could not create threadcreate profile %q: %v", fn, err)
 		return
 	}
 
-	logger.Infof("profile: threadcreate profiling enabled, %s", fn)
+	logx.GlobalLogger().Infof("profile: threadcreate profiling enabled, %s", fn)
 	p.closers = append(p.closers, func() {
 		if mp := pprof.Lookup("threadcreate"); mp != nil {
 			mp.WriteTo(f, 0)
 		}
 		f.Close()
-		logger.Infof("profile: threadcreate profiling disabled, %s", fn)
+		logx.GlobalLogger().Infof("profile: threadcreate profiling disabled, %s", fn)
 	})
 }
 
@@ -134,19 +135,19 @@ func (p *Profile) startTraceProfile() {
 	fn := createDumpFile("trace")
 	f, err := os.Create(fn)
 	if err != nil {
-		logger.Errorf("profile: could not create trace output file %q: %v", fn, err)
+		logx.GlobalLogger().Errorf("profile: could not create trace output file %q: %v", fn, err)
 		return
 	}
 
 	if err := trace.Start(f); err != nil {
-		logger.Errorf("profile: could not start trace: %v", err)
+		logx.GlobalLogger().Errorf("profile: could not start trace: %v", err)
 		return
 	}
 
-	logger.Infof("profile: trace enabled, %s", fn)
+	logx.GlobalLogger().Infof("profile: trace enabled, %s", fn)
 	p.closers = append(p.closers, func() {
 		trace.Stop()
-		logger.Infof("profile: trace disabled, %s", fn)
+		logx.GlobalLogger().Infof("profile: trace disabled, %s", fn)
 	})
 }
 
@@ -165,7 +166,7 @@ func (p *Profile) Stop() {
 // to cleanly stop profiling.
 func StartProfile() Stopper {
 	if !atomic.CompareAndSwapUint32(&started, 0, 1) {
-		logger.Error("profile: Start() already called")
+		logx.GlobalLogger().Error("profile: Start() already called")
 		return noopStopper
 	}
 
@@ -182,7 +183,7 @@ func StartProfile() Stopper {
 		signal.Notify(c, syscall.SIGINT)
 		<-c
 
-		logger.Info("profile: caught interrupt, stopping profiles")
+		logx.GlobalLogger().Info("profile: caught interrupt, stopping profiles")
 		prof.Stop()
 
 		signal.Reset()

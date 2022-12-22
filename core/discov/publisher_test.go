@@ -14,10 +14,6 @@ import (
 	clientv3 "go.etcd.io/etcd/client/v3"
 )
 
-func init() {
-	// logx.Disable()
-}
-
 func TestPublisher_register(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

@@ -17,17 +17,12 @@ type SqlConf struct {
 	MaxIdleConn int           `default:"64"`
 	MaxOpenConn int           `default:"64"`
 	MaxLifetime time.Duration `default:"1m"`
-
-	keyName string
 }
 
 func (c *SqlConf) sourceName() string {
-	if c.keyName == "" {
-		c.keyName = fmt.Sprintf("%s://%s@%s/%s",
-			c.Driver,
-			c.User,
-			c.Addr,
-			c.Name)
-	}
-	return c.keyName
+	return fmt.Sprintf("%s://%s@%s/%s",
+		c.Driver,
+		c.User,
+		c.Addr,
+		c.Name)
 }

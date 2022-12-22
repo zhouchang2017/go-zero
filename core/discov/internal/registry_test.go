@@ -17,10 +17,6 @@ import (
 
 var mockLock sync.Mutex
 
-func init() {
-	// logx.Disable()
-}
-
 func setMockClient(cli EtcdClient) func() {
 	mockLock.Lock()
 	NewClient = func([]string) (EtcdClient, error) {

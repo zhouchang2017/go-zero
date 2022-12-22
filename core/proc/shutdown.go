@@ -4,6 +4,7 @@
 package proc
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"os"
 	"os/signal"
 	"sync"
@@ -45,14 +46,14 @@ func SetTimeToForceQuit(duration time.Duration) {
 func gracefulStop(signals chan os.Signal) {
 	signal.Stop(signals)
 
-	logger.Info("Got signal SIGTERM, shutting down...")
+	logx.GlobalLogger().Info("Got signal SIGTERM, shutting down...")
 	go wrapUpListeners.notifyListeners()
 
 	time.Sleep(wrapUpTime)
 	go shutdownListeners.notifyListeners()
 
 	time.Sleep(delayTimeBeforeForceQuit - wrapUpTime)
-	logger.Infof("Still alive after %v, going to force kill the process...", delayTimeBeforeForceQuit)
+	logx.GlobalLogger().Infof("Still alive after %v, going to force kill the process...", delayTimeBeforeForceQuit)
 	syscall.Kill(syscall.Getpid(), syscall.SIGTERM)
 }
 

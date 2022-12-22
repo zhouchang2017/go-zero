@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/zeromicro/go-zero/core/load"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/proc"
 	"github.com/zeromicro/go-zero/core/prometheus"
 	"github.com/zeromicro/go-zero/core/stat"
@@ -28,7 +27,6 @@ const (
 // A ServiceConf is a service config.
 type ServiceConf struct {
 	Name       string
-	Logs       logx.LogConfigMap
 	Mode       string `default:"pro"`
 	MetricsUrl string
 	// Deprecated: please use DevServer
@@ -46,10 +44,6 @@ func (sc ServiceConf) MustSetUp() {
 
 // SetUp sets up the service.
 func (sc ServiceConf) SetUp() error {
-	if err := sc.Logs.Init(); err != nil {
-		return err
-	}
-
 	sc.initMode()
 	prometheus.StartAgent(sc.Prometheus)
 

@@ -1,11 +1,30 @@
 package syncx
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"io"
 	"sync"
 
 	"github.com/zeromicro/go-zero/core/errorx"
 )
+
+var (
+	resourceManagers []*ResourceManager
+	_lock            sync.Mutex
+	once             sync.Once
+)
+
+// CloseAllResource 关闭所有打开的资源
+// 可以在main函数里注册在proc.AddShutdownListener回调内
+func CloseAllResource() {
+	once.Do(func() {
+		for _, manager := range resourceManagers {
+			if manager.resources != nil {
+				_ = manager.Close()
+			}
+		}
+	})
+}
 
 // A ResourceManager is a manager that used to manage resources.
 type ResourceManager struct {
@@ -16,10 +35,14 @@ type ResourceManager struct {
 
 // NewResourceManager returns a ResourceManager.
 func NewResourceManager() *ResourceManager {
-	return &ResourceManager{
+	_lock.Lock()
+	defer _lock.Unlock()
+	resource := &ResourceManager{
 		resources:    make(map[string]io.Closer),
 		singleFlight: NewSingleFlight(),
 	}
+	resourceManagers = append(resourceManagers, resource)
+	return resource
 }
 
 // Close closes the manager.
@@ -29,10 +52,13 @@ func (manager *ResourceManager) Close() error {
 	defer manager.lock.Unlock()
 
 	var be errorx.BatchError
-	for _, resource := range manager.resources {
-		if err := resource.Close(); err != nil {
+	for name, resource := range manager.resources {
+		var err error
+		if err = resource.Close(); err != nil {
+			logx.GlobalLogger().Errorf("%s resource close err: %s", name, err.Error())
 			be.Add(err)
 		}
+		logx.GlobalLogger().Infof("%s resource close success", name)
 	}
 
 	// release resources to avoid using it later
@@ -53,8 +79,10 @@ func (manager *ResourceManager) GetResource(key string, create func() (io.Closer
 
 		resource, err := create()
 		if err != nil {
+			logx.GlobalLogger().Errorf("%s resource open err: %s", key, err.Error())
 			return nil, err
 		}
+		logx.GlobalLogger().Infof("%s resource open success", key)
 
 		manager.lock.Lock()
 		defer manager.lock.Unlock()

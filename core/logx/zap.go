@@ -19,6 +19,10 @@ type ZapLogger struct {
 	level *zap.AtomicLevel
 }
 
+func (z *ZapLogger) Close() error {
+	return z.base.Sync()
+}
+
 func (z *ZapLogger) clone() *ZapLogger {
 	copy := *z
 	return &copy

@@ -11,7 +11,6 @@ import (
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/mathx"
 	"github.com/zeromicro/go-zero/core/stat"
 	"github.com/zeromicro/go-zero/core/stores/redis"
@@ -22,7 +21,6 @@ import (
 var errTestNotFound = errors.New("not found")
 
 func init() {
-	logx.Disable()
 	stat.SetReporter(nil)
 }
 

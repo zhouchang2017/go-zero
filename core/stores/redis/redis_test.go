@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"io"
 	"strconv"
 	"testing"
@@ -13,7 +12,6 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	red "github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stringx"
 )
 
@@ -1175,12 +1173,13 @@ func TestRedis_WithPass(t *testing.T) {
 }
 
 func runOnRedis(t *testing.T, fn func(client *Redis)) {
-	logx.Disable()
-
 	s, err := miniredis.Run()
 	assert.Nil(t, err)
 	defer func() {
-		client, err := clientManager.GetResource(fmt.Sprintf("%s_0", s.Addr()), func() (io.Closer, error) {
+		client, err := clientManager.GetResource(redisResourceName(&Redis{
+			Addr: s.Addr(),
+			DB:   0,
+		}), func() (io.Closer, error) {
 			return nil, errors.New("should already exist")
 		})
 		if err != nil {
@@ -1195,15 +1194,16 @@ func runOnRedis(t *testing.T, fn func(client *Redis)) {
 }
 
 func runOnRedisTLS(t *testing.T, fn func(client *Redis)) {
-	logx.Disable()
-
 	s, err := miniredis.RunTLS(&tls.Config{
 		Certificates:       make([]tls.Certificate, 1),
 		InsecureSkipVerify: true,
 	})
 	assert.Nil(t, err)
 	defer func() {
-		client, err := clientManager.GetResource(fmt.Sprintf("%s_0", s.Addr()), func() (io.Closer, error) {
+		client, err := clientManager.GetResource(redisResourceName(&Redis{
+			Addr: s.Addr(),
+			DB:   0,
+		}), func() (io.Closer, error) {
 			return nil, errors.New("should already exist")
 		})
 		if err != nil {

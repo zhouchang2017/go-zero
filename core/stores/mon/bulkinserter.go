@@ -2,10 +2,10 @@ package mon
 
 import (
 	"context"
+	"github.com/zeromicro/go-zero/core/logx"
 	"time"
 
 	"github.com/zeromicro/go-zero/core/executors"
-	"github.com/zeromicro/go-zero/core/logx"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 

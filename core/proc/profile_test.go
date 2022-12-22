@@ -9,7 +9,7 @@ import (
 
 func TestProfile(t *testing.T) {
 	var buf strings.Builder
-	logger = logx.NewTestLogger(&buf)
+	logx.SetGlobalLogger(logx.NewTestLogger(&buf))
 
 	profiler := StartProfile()
 	// start again should not work

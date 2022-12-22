@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	SqlHook interface {
+	Hook interface {
 		OnExecStart(ctx context.Context, q string, args ...interface{})
 		OnExecFinished(ctx context.Context, err error)
 
@@ -21,10 +21,10 @@ type (
 	}
 )
 
-var sqlHooks []SqlHook
+var sqlHooks []Hook
 var _lock sync.Mutex
 
-func RegisterSqlHooks(h SqlHook) {
+func AddHook(h Hook) {
 	_lock.Lock()
 	defer _lock.Unlock()
 	sqlHooks = append(sqlHooks, h)

@@ -1,11 +1,11 @@
 package stat
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"runtime"
 	"sync/atomic"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stat/internal"
 	"github.com/zeromicro/go-zero/core/threading"
 )
@@ -58,6 +58,6 @@ func bToMb(b uint64) float32 {
 func printUsage() {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	logx.GlobalLogger().Infof("CPU: %dm, MEMORY: Alloc=%.1fMi, TotalAlloc=%.1fMi, Sys=%.1fMi, NumGC=%d",
+	logx.GlobalLogger().Infof("[stat] CPU: %dm, MEMORY: Alloc=%.1fMi, TotalAlloc=%.1fMi, Sys=%.1fMi, NumGC=%d",
 		CpuUsage(), bToMb(m.Alloc), bToMb(m.TotalAlloc), bToMb(m.Sys), m.NumGC)
 }

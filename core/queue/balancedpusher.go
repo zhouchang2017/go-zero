@@ -2,9 +2,8 @@ package queue
 
 import (
 	"errors"
-	"sync/atomic"
-
 	"github.com/zeromicro/go-zero/core/logx"
+	"sync/atomic"
 )
 
 // ErrNoAvailablePusher indicates no pusher available.

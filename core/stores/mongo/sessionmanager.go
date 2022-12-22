@@ -1,11 +1,11 @@
 package mongo
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"io"
 	"time"
 
 	"github.com/globalsign/mgo"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/syncx"
 )
 

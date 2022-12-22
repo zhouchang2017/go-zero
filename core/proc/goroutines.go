@@ -5,6 +5,7 @@ package proc
 
 import (
 	"fmt"
+	"github.com/zeromicro/go-zero/core/logx"
 	"os"
 	"path"
 	"runtime/pprof"
@@ -23,10 +24,10 @@ func dumpGoroutines() {
 	dumpFile := path.Join(os.TempDir(), fmt.Sprintf("%s-%d-goroutines-%s.dump",
 		command, pid, time.Now().Format(timeFormat)))
 
-	logger.Infof("Got dump goroutine signal, printing goroutine profile to %s", dumpFile)
+	logx.GlobalLogger().Infof("Got dump goroutine signal, printing goroutine profile to %s", dumpFile)
 
 	if f, err := os.Create(dumpFile); err != nil {
-		logger.Errorf("Failed to dump goroutine profile, error: %v", err)
+		logx.GlobalLogger().Errorf("Failed to dump goroutine profile, error: %v", err)
 	} else {
 		defer f.Close()
 		pprof.Lookup(goroutineProfile).WriteTo(f, debugLevel)

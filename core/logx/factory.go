@@ -1,6 +1,7 @@
 package logx
 
 import (
+	"github.com/zeromicro/go-zero/core/iox"
 	"go.uber.org/zap"
 	"go.uber.org/zap/buffer"
 	"go.uber.org/zap/zapcore"
@@ -12,7 +13,7 @@ import (
 )
 
 func NewTestLogger(w io.Writer) *ZapLogger {
-	return New("plain", "", "debug", true, 3, w)
+	return New("plain", "", "debug", true, 3, iox.NopCloser(w))
 }
 
 // NewDevelopment 开发Logger
@@ -29,20 +30,20 @@ func newJsonDevelopment() *ZapLogger {
 }
 
 // NewWithConf 通过配置实例化 Logger
-func NewWithConf(conf *LogConf) (*ZapLogger, error) {
+func NewWithConf(conf *LogConf) (logger *ZapLogger, err error) {
 	if conf == nil {
 		return NewDevelopment(), nil
 	}
-	writer, err := conf.buildWriter()
+	writers, err := conf.buildWriter()
 	if err != nil {
 		return nil, err
 	}
-	return New(conf.Formatter, conf.TimeFormatter, conf.Level, conf.EnableFileLine, 0, writer...), nil
+	return New(conf.Formatter, conf.TimeFormatter, conf.Level, conf.EnableFileLine, 0, writers...), nil
 }
 
 // New 构造函数
 func New(format string, timeFormat string, level string, enableFileLine bool, callerSkip int,
-	writers ...io.Writer) *ZapLogger {
+	writers ...io.WriteCloser) *ZapLogger {
 	if callerSkip == 0 {
 		callerSkip = 2
 	}
@@ -57,7 +58,7 @@ func New(format string, timeFormat string, level string, enableFileLine bool, ca
 }
 
 func newZapLogger(format string, timeFormat string, level string, enableFileLine bool,
-	writers ...io.Writer) (*zap.Logger, *zap.AtomicLevel) {
+	writers ...io.WriteCloser) (*zap.Logger, *zap.AtomicLevel) {
 	atomicLevel := zap.NewAtomicLevel()
 	atomicLevel.SetLevel(strToLevel(level))
 

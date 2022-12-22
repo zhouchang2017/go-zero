@@ -1,12 +1,12 @@
 package queue
 
 import (
+	"github.com/zeromicro/go-zero/core/logx"
 	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/rescue"
 	"github.com/zeromicro/go-zero/core/stat"
 	"github.com/zeromicro/go-zero/core/threading"

@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/zeromicro/go-zero/core/logx"
 	"net/http"
 	"time"
-
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const (

@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"strings"
+	"sync"
 	"time"
 
 	red "github.com/go-redis/redis/v8"
@@ -27,6 +28,8 @@ var (
 	startTimeKey          = contextKey("startTime")
 	durationHook          = hook{tracer: otel.GetTracerProvider().Tracer(trace.TraceName)}
 	redisCmdsAttributeKey = attribute.Key("redis.cmds")
+	customHooks           []red.Hook // 自定义redisHook
+	_lock                 sync.Mutex
 )
 
 type (
@@ -35,6 +38,12 @@ type (
 		tracer oteltrace.Tracer
 	}
 )
+
+func AddHook(h red.Hook) {
+	_lock.Lock()
+	defer _lock.Unlock()
+	customHooks = append(customHooks, h)
+}
 
 func (h hook) BeforeProcess(ctx context.Context, cmd red.Cmder) (context.Context, error) {
 	return h.startSpan(context.WithValue(ctx, startTimeKey, timex.Now()), cmd), nil

@@ -1,6 +1,7 @@
 package fx
 
 import (
+	"go.uber.org/goleak"
 	"io"
 	"log"
 	"math/rand"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/stringx"
-	"go.uber.org/goleak"
 )
 
 func TestBuffer(t *testing.T) {

@@ -9,7 +9,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/collection"
-	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/mathx"
 	"github.com/zeromicro/go-zero/core/stat"
 	"github.com/zeromicro/go-zero/core/syncx"
@@ -121,7 +120,6 @@ func TestAdaptiveShedderMaxFlight(t *testing.T) {
 }
 
 func TestAdaptiveShedderShouldDrop(t *testing.T) {
-	logx.Disable()
 	passCounter := newRollingWindow()
 	rtCounter := newRollingWindow()
 	for i := 0; i < 10; i++ {
@@ -175,7 +173,6 @@ func TestAdaptiveShedderShouldDrop(t *testing.T) {
 }
 
 func TestAdaptiveShedderStillHot(t *testing.T) {
-	logx.Disable()
 	passCounter := newRollingWindow()
 	rtCounter := newRollingWindow()
 	for i := 0; i < 10; i++ {
@@ -203,8 +200,6 @@ func TestAdaptiveShedderStillHot(t *testing.T) {
 }
 
 func BenchmarkAdaptiveShedder_Allow(b *testing.B) {
-	logx.Disable()
-
 	bench := func(b *testing.B) {
 		shedder := NewAdaptiveShedder()
 		proba := mathx.NewProba()

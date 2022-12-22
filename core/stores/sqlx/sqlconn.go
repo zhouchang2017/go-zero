@@ -3,9 +3,9 @@ package sqlx
 import (
 	"context"
 	"database/sql"
+	"github.com/zeromicro/go-zero/core/logx"
 
 	"github.com/zeromicro/go-zero/core/breaker"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 // spanName is used to identify the span name for the SQL execution.
@@ -93,7 +93,12 @@ type (
 )
 
 // NewSqlConnFromConf returns a SqlConn with given sqlConf.
-func NewSqlConnFromConf(conf SqlConf, opts ...SqlOption) SqlConn {
+func NewSqlConnFromConf(conf SqlConf, opts ...SqlOption) (SqlConn, error) {
+	// 进来就建立连接，避免运行之后的一些异常
+	_, err := getSqlConnFromConf(conf)
+	if err != nil {
+		return nil, err
+	}
 	conn := &commonSqlConn{
 		connProv: func() (*sql.DB, error) {
 			return getSqlConnFromConf(conf)
@@ -108,7 +113,7 @@ func NewSqlConnFromConf(conf SqlConf, opts ...SqlOption) SqlConn {
 		opt(conn)
 	}
 
-	return conn
+	return conn, nil
 }
 
 // NewSqlConn returns a SqlConn with given driver name and datasource.

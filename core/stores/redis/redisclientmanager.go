@@ -20,8 +20,12 @@ const (
 var clientManager = syncx.NewResourceManager()
 var Dialer func(ctx context.Context, network, addr string) (net.Conn, error)
 
+func redisResourceName(r *Redis) string {
+	return fmt.Sprintf("redis://%s_%d", r.Addr, r.DB)
+}
+
 func getClient(r *Redis) (*red.Client, error) {
-	val, err := clientManager.GetResource(fmt.Sprintf("%s_%d", r.Addr, r.DB), func() (io.Closer, error) {
+	val, err := clientManager.GetResource(redisResourceName(r), func() (io.Closer, error) {
 		var tlsConfig *tls.Config
 		if r.tls {
 			tlsConfig = &tls.Config{
@@ -38,7 +42,9 @@ func getClient(r *Redis) (*red.Client, error) {
 			Dialer:       Dialer,
 		})
 		store.AddHook(durationHook)
-
+		for _, h := range customHooks {
+			store.AddHook(h)
+		}
 		return store, nil
 	})
 	if err != nil {

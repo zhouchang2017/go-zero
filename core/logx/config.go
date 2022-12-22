@@ -31,15 +31,15 @@ type LogConf struct {
 	//单位为m 默认200m 分割
 	MaxFileSize int `default:"200"`
 	//文件保存的个数 默认200
-	MaxBackup int  `default:"200"`
-	Default   bool `default:"false"`
+	MaxBackup int `default:"200"`
+	Default   bool
 }
 
-func (c *LogConf) buildWriter() (writers []io.Writer, err error) {
+func (c *LogConf) buildWriter() (writers []io.WriteCloser, err error) {
 	if c.Path == "" {
 		return nil, errors.New("log path is empty")
 	}
-	writers = make([]io.Writer, 0, 2)
+	writers = make([]io.WriteCloser, 0, 2)
 	if strings.Index(c.Path, "%Y%m%d") >= 0 {
 		writer, err := rotatelogsbytime.New(
 			c.Path,
@@ -63,4 +63,15 @@ func (c *LogConf) buildWriter() (writers []io.Writer, err error) {
 		writers = append(writers, os.Stdout)
 	}
 	return writers, nil
+}
+
+func (c LogConf) New() (Logger, error) {
+	logger, err := NewWithConf(&c)
+	if err != nil {
+		return nil, err
+	}
+	if c.Default {
+		SetGlobalLogger(logger)
+	}
+	return logger, nil
 }

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/zeromicro/go-zero/core/iox"
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 const (
