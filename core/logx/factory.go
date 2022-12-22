@@ -114,6 +114,10 @@ func newPlainEncoder(timeFormat string) zapcore.Encoder {
 		timeFormat = "2006-01-02 15:04:05.000000"
 	}
 
+	config.EncodeDuration = func(duration time.Duration, encoder zapcore.PrimitiveArrayEncoder) {
+		encoder.AppendString(duration.String())
+	}
+
 	config.ConsoleSeparator = " "
 	config.EncodeTime = newEncodeTime(timeFormat)
 	config.EncodeLevel = encodeLevel

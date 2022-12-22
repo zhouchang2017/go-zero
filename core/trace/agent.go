@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/logx"
+	"strings"
 	"sync"
 
 	"github.com/zeromicro/go-zero/core/lang"
@@ -41,7 +42,7 @@ func StartAgent(c Config) {
 	lock.Lock()
 	defer lock.Unlock()
 
-	_, ok := agents[c.Endpoint]
+	_, ok := agents[c.key()]
 	if ok {
 		return
 	}
@@ -51,7 +52,7 @@ func StartAgent(c Config) {
 		return
 	}
 
-	agents[c.Endpoint] = lang.Placeholder
+	agents[c.key()] = lang.Placeholder
 }
 
 // StopAgent shuts down the span processors in the order they were registered.
@@ -63,6 +64,18 @@ func createExporter(c Config) (sdktrace.SpanExporter, error) {
 	// Just support jaeger and zipkin now, more for later
 	switch c.Batcher {
 	case kindJaeger:
+		if c.Addr != "" {
+			split := strings.Split(c.Addr, ":")
+			if len(split) == 2 {
+				// 通过agent上报，走udp
+				return jaeger.New(jaeger.WithAgentEndpoint(
+					jaeger.WithAgentHost(split[0]),
+					jaeger.WithAgentPort(split[1]),
+				))
+			} else {
+				return nil, fmt.Errorf("addr err: %s", c.Addr)
+			}
+		}
 		return jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(c.Endpoint)))
 	case kindZipkin:
 		return zipkin.New(c.Endpoint)
@@ -85,7 +98,7 @@ func startAgent(c Config) error {
 		sdktrace.WithResource(resource.NewSchemaless(semconv.ServiceNameKey.String(c.Name))),
 	}
 
-	if len(c.Endpoint) > 0 {
+	if len(c.Endpoint) > 0 || len(c.Addr) > 0 {
 		exp, err := createExporter(c)
 		if err != nil {
 			logx.GlobalLogger().Error(err)
