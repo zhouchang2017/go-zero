@@ -7,7 +7,7 @@ import (
 	"github.com/zeromicro/go-zero/tools/goctl/util/format"
 )
 
-const ctxFilename = "ctx"
+const ctxFilename = "ctx_gen"
 
 //go:embed ctx.tpl
 var ctxTemplate string

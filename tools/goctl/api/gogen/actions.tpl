@@ -7,8 +7,6 @@ import (
 	{{.ImportPackages}}
 )
 
-{{- .AddActionInit}}
-
 var {{.Action}}Actions map[string]func(svcCtx *svc.ServiceContext) types.ActionHandler
 var _{{.Action}}Lock sync.Mutex
 
