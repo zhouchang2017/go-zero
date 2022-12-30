@@ -1,8 +1,8 @@
 package httpx
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/creasty/defaults"
 	"github.com/go-playground/validator/v10"
 	"github.com/zeromicro/go-zero/core/syncx"
 	"io"
@@ -99,8 +99,13 @@ func ParseJsonBody(r *http.Request, v interface{}) error {
 			return err
 		}
 
+		if cv, ok := v.(interface {
+			WithContextValue(ctx context.Context)
+		}); ok {
+			cv.WithContextValue(r.Context())
+		}
+
 		if validatePostJsonBody.True() {
-			_ = defaults.Set(v)
 			return validate.Struct(v)
 		}
 		return nil
